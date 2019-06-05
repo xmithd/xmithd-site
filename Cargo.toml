@@ -1,0 +1,9 @@
+[package]
+name = "website-rs"
+version = "1.0.0"
+authors = ["Amit Dayaram <amit.hotchandanidayaram@mcgill.ca>"]
+edition = "2018"
+
+[dependencies]
+actix-web = "1.0"
+actix-files = "0.1.1"
