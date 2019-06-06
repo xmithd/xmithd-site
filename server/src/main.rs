@@ -9,7 +9,7 @@ use actix_web::{
 };
 
 fn index() -> Result<fs::NamedFile> {
-  let file = fs::NamedFile::open("ui/build/index.html")?;
+  let file = fs::NamedFile::open("../ui/build/index.html")?;
   Ok(file)
 }
 
@@ -21,7 +21,7 @@ fn main() -> io::Result<()> {
   HttpServer::new(|| {
     App::new()
     .service(web::resource("/").route(web::get().to(index)))
-    .service(fs::Files::new("/", "ui/build"))
+    .service(fs::Files::new("/", "../ui/build"))
   })
   .bind(&addr)?
   .run()
