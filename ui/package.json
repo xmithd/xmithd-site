@@ -1,6 +1,7 @@
 {
   "name": "ui",
   "version": "0.1.0",
+  "homepage": "https://xmithd.com/webapp",
   "private": true,
   "dependencies": {
     "@types/jest": "24.0.13",
