@@ -4,6 +4,12 @@ mod routes;
 
 use std::{io};
 
+extern crate log;
+
+extern crate env_logger;
+
+use log::{info};
+
 use actix_files as fs;
 
 #[macro_use]
@@ -28,9 +34,9 @@ fn ui_app(webapp_root: &str) -> Result<fs::NamedFile> {
 }
 
 fn main() -> io::Result<()> {
-  let addr = format!("127.0.0.1:{}", config::PORT);
-  println!("Starting http server at http://{}", &addr);
-
+  env_logger::init();
+  let addr = format!("{}:{}", config::HOST, config::PORT);
+  info!("Starting http server at http://{}", &addr);
   // Handlebars uses a repository for the compiled templates. This object must be
   // shared between the application threads, and is therefore passed to the
   // Application Builder as an atomic reference-counted pointer.
@@ -46,6 +52,7 @@ fn main() -> io::Result<()> {
         .wrap(Logger::new("%a %t \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T"))
         .register_data(handlebars_ref.clone())
         .service(routes::home)
+        .service(routes::apps)
         .service(web::resource("/chatapp").route(web::get().to(|| ui_app(config::REALTIME_CHAT_APP_ROOT))))
         .service(fs::Files::new("/chatapp", config::REALTIME_CHAT_APP_ROOT))
         .service(fs::Files::new("/", config::PUBLIC_FOLDER))

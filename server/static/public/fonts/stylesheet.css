@@ -1,0 +1,23 @@
+/*! font from https://www.dafont.com/connection-ii.font */
+
+
+
+@font-face {
+    font-family: 'connectionregular';
+    src: url('connection-webfont.woff2') format('woff2'),
+         url('connection-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+
+
+@font-face {
+    font-family: 'connectionbold';
+    src: url('connectionbold-webfont.woff2') format('woff2'),
+         url('connectionbold-webfont.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+
+}

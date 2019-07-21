@@ -1,10 +1,12 @@
 [package]
-name = "xmithd-website-backend"
+name = "xmithd_backend"
 version = "1.0.0"
 authors = ["Amit Dayaram <amit.hotchandanidayaram@mcgill.ca>"]
 edition = "2018"
 
 [dependencies]
+log = "0.4"
+env_logger = "0.6"
 actix-web = "1.0"
 actix-files = "0.1.3"
 serde_json = "1.0"
