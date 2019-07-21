@@ -1,7 +1,7 @@
 {
-  "name": "ui",
-  "version": "0.1.0",
-  "homepage": "https://xmithd.com/webapp",
+  "name": "xmithd-chatapp",
+  "version": "1.0.0",
+  "homepage": "https://xmithd.com/chatapp",
   "private": true,
   "dependencies": {
     "@types/jest": "24.0.13",
