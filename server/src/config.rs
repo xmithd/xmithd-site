@@ -11,3 +11,4 @@ pub const MY_NAME: &str = "Amit Hotchandani Dayaram";
 pub const MY_EMAIL: &str = "<i>amit.hdayaram</i> <b>at</b> <i>gmail</i> <b>dot</b> <i>com</i>";
 pub const MY_TWITTER_HANDLE: &str = "xmithd";
 pub const GITHUB_HANDLE: &str = "xmithd";
+pub const HTML_CONTENT_TYPE: &str = "text/html; charset=utf-8";

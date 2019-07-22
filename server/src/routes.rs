@@ -13,7 +13,7 @@ pub fn home(hb: web::Data<Handlebars>) -> HttpResponse {
     });
     let body = hb.render("home", &data).unwrap();
 
-    HttpResponse::Ok().body(body)
+    HttpResponse::Ok().content_type(config::HTML_CONTENT_TYPE).body(body)
 }
 
 #[get("/apps")]
@@ -25,7 +25,7 @@ pub fn apps(hb: web::Data<Handlebars>) -> HttpResponse {
         "github_handle": config::GITHUB_HANDLE
     });
     let body = hb.render("apps", &data).unwrap();
-    HttpResponse::Ok().body(body)
+    HttpResponse::Ok().content_type(config::HTML_CONTENT_TYPE).body(body)
 }
 
 #[get("/about")]
@@ -34,7 +34,7 @@ pub fn about(hb: web::Data<Handlebars>) -> HttpResponse {
         "full_name": config::MY_NAME
     });
     let body = hb.render("about", &data).unwrap();
-    HttpResponse::Ok().body(body)
+    HttpResponse::Ok().content_type(config::HTML_CONTENT_TYPE).body(body)
 }
 
 #[get("/contact")]
@@ -44,5 +44,5 @@ pub fn contact(hb: web::Data<Handlebars>) -> HttpResponse {
         "twitter_handle": config::MY_TWITTER_HANDLE
     });
     let body = hb.render("contact", &data).unwrap();
-    HttpResponse::Ok().body(body)
+    HttpResponse::Ok().content_type(config::HTML_CONTENT_TYPE).body(body)
 }
