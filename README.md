@@ -29,7 +29,7 @@ Finally, upload the binary in `./target/release/xmithd_backend` into the `~/proj
 ### Step 5: run with the desired log variables:
 From the `~/project/server` directory, run:
 ```
-RUST_LOG=xmithd_backend=debug ./xmithd_backend
+RUST_LOG=xmithd_backend=debug,actix_web=info ./xmithd_backend > xmithd_backend.log
 ```
 
 
