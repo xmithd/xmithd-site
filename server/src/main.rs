@@ -47,12 +47,16 @@ fn main() -> io::Result<()> {
   handlebars.set_strict_mode(true);
   let handlebars_ref = web::Data::new(handlebars);
 
+  // TODO add error handling middleware
+
   HttpServer::new( move || {
     App::new()
         .wrap(Logger::new("%a %t \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T"))
         .register_data(handlebars_ref.clone())
         .service(routes::home)
         .service(routes::apps)
+        .service(routes::about)
+        .service(routes::contact)
         .service(web::resource("/chatapp").route(web::get().to(|| ui_app(config::REALTIME_CHAT_APP_ROOT))))
         .service(fs::Files::new("/chatapp", config::REALTIME_CHAT_APP_ROOT))
         .service(fs::Files::new("/", config::PUBLIC_FOLDER))
