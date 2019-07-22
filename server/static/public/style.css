@@ -1,18 +1,35 @@
 body {
     background-color: white;
+    font-family: monospace;
+    margin: 0;
+}
+
+main {
+    margin: 8px;
 }
 
 a {
-    /*color: #0060B6;*/
-    color: inherit;
+    color: #0060B6;
     text-decoration: none;
 }
 
 a:hover
 {
-    /*color:#00A0C6;*/
+    color:#00A0C6;
     text-decoration:none;
     cursor:pointer;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+article {
+    min-height: 100%;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: 100%;
 }
 
 #nav-toggle, .burger-menu {
@@ -34,12 +51,13 @@ a:hover
 nav {
     max-width: 1720px;
     margin: 0 auto;
-    font-family: "connectionregular";
+    font-family: "connectionregular", monospace;
     display: grid;
     grid-template-columns: 1fr auto 1fr;
 }
 
 nav a {
+    color: inherit;
     text-decoration: none;
     /*text-transform: uppercase;*/
     transition: .3s all ease-in-out;
@@ -61,7 +79,7 @@ nav a:hover {
     grid-column: 2;
     text-shadow: gray;
     color: black;
-    font-family: "connectionbold";
+    font-family: "connectionbold", monospace;
     font-size: 20px;
     padding: 1rem;
 }
@@ -84,5 +102,21 @@ nav a:hover {
         display: grid;
         grid-row: 2;
     }
+}
+
+footer {
+    background-color: ghostwhite;
+    font-family: "connectionregular", monospace;
+    font-size: small;
+}
+
+footer .content {
+    padding: 10px;
+    text-align: right;
+}
+
+span.copyleft {
+    display: inline-block;
+    transform: rotate(180deg);
 }
 
