@@ -1,48 +1,48 @@
 
 use actix_web::{web, HttpResponse};
-use handlebars::Handlebars;
 
-use super::config;
+use super::constants;
+use super::data::Datasources;
 
 // TODO add proper error handling
 
 #[get("/")]
-pub fn home(hb: web::Data<Handlebars>) -> HttpResponse {
+pub fn home(ds: web::Data<Datasources>) -> HttpResponse {
     let data = json!({
-        "site_name": config::SITE_NAME,
+        "site_name": constants::SITE_NAME,
     });
-    let body = hb.render("home", &data).unwrap();
+    let body = ds.handlebars().render("home", &data).unwrap();
 
-    HttpResponse::Ok().content_type(config::HTML_CONTENT_TYPE).body(body)
+    HttpResponse::Ok().content_type(constants::HTML_CONTENT_TYPE).body(body)
 }
 
 #[get("/apps")]
-pub fn apps(hb: web::Data<Handlebars>) -> HttpResponse {
+pub fn apps(ds: web::Data<Datasources>) -> HttpResponse {
     let data = json!({
         "apps": {
             "chatapp": "/chatapp"
         },
-        "github_handle": config::GITHUB_HANDLE
+        "github_handle": constants::GITHUB_HANDLE
     });
-    let body = hb.render("apps", &data).unwrap();
-    HttpResponse::Ok().content_type(config::HTML_CONTENT_TYPE).body(body)
+    let body = ds.handlebars().render("apps", &data).unwrap();
+    HttpResponse::Ok().content_type(constants::HTML_CONTENT_TYPE).body(body)
 }
 
 #[get("/about")]
-pub fn about(hb: web::Data<Handlebars>) -> HttpResponse {
+pub fn about(ds: web::Data<Datasources>) -> HttpResponse {
     let data = json!({
-        "full_name": config::MY_NAME
+        "full_name": constants::MY_NAME
     });
-    let body = hb.render("about", &data).unwrap();
-    HttpResponse::Ok().content_type(config::HTML_CONTENT_TYPE).body(body)
+    let body = ds.handlebars().render("about", &data).unwrap();
+    HttpResponse::Ok().content_type(constants::HTML_CONTENT_TYPE).body(body)
 }
 
 #[get("/contact")]
-pub fn contact(hb: web::Data<Handlebars>) -> HttpResponse {
+pub fn contact(ds: web::Data<Datasources>) -> HttpResponse {
     let data = json!({
-        "email": config::MY_EMAIL,
-        "twitter_handle": config::MY_TWITTER_HANDLE
+        "email": constants::MY_EMAIL,
+        "twitter_handle": constants::MY_TWITTER_HANDLE
     });
-    let body = hb.render("contact", &data).unwrap();
-    HttpResponse::Ok().content_type(config::HTML_CONTENT_TYPE).body(body)
+    let body = ds.handlebars().render("contact", &data).unwrap();
+    HttpResponse::Ok().content_type(constants::HTML_CONTENT_TYPE).body(body)
 }
