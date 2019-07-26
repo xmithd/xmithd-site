@@ -1,7 +1,11 @@
 use handlebars::Handlebars;
+mod config;
+
+use config::Config;
 
 pub struct Datasources {
     hb: handlebars::Handlebars,
+    config: Config,
 }
 
 impl Datasources {
@@ -15,11 +19,16 @@ impl Datasources {
             .unwrap();
         handlebars.set_strict_mode(true);
         Self {
-            hb: handlebars
+            hb: handlebars,
+            config: Config::load()
         }
     }
 
     pub fn handlebars(&self) -> &handlebars::Handlebars {
         &self.hb
+    }
+
+    pub fn conf(&self) -> &Config {
+        &self.config
     }
 }

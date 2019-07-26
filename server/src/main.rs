@@ -20,6 +20,7 @@ use actix_web::middleware::Logger;
 
 #[macro_use]
 extern crate serde_json;
+extern crate serde_derive;
 
 fn render_file(file_name: &str) -> Result<fs::NamedFile> {
   let file = fs::NamedFile::open(file_name)?;
@@ -33,10 +34,11 @@ fn ui_app(webapp_root: &str) -> Result<fs::NamedFile> {
 
 fn main() -> io::Result<()> {
   env_logger::init();
-  let addr = format!("{}:{}", constants::HOST, constants::PORT);
+  let state = data::Datasources::new();
+  let addr = format!("{}:{}", state.conf().host, state.conf().port);
   info!("Starting http server at http://{}", &addr);
 
-  let datasources_ref = web::Data::new(data::Datasources::new());
+  let datasources_ref = web::Data::new(state);
 
   // TODO add error handling middleware
 

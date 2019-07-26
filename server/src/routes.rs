@@ -9,7 +9,7 @@ use super::data::Datasources;
 #[get("/")]
 pub fn home(ds: web::Data<Datasources>) -> HttpResponse {
     let data = json!({
-        "site_name": constants::SITE_NAME,
+        "site_name": &ds.conf().site_domain,
     });
     let body = ds.handlebars().render("home", &data).unwrap();
 
@@ -22,7 +22,7 @@ pub fn apps(ds: web::Data<Datasources>) -> HttpResponse {
         "apps": {
             "chatapp": "/chatapp"
         },
-        "github_handle": constants::GITHUB_HANDLE
+        "github_handle": &ds.conf().author_github_name
     });
     let body = ds.handlebars().render("apps", &data).unwrap();
     HttpResponse::Ok().content_type(constants::HTML_CONTENT_TYPE).body(body)
@@ -31,7 +31,7 @@ pub fn apps(ds: web::Data<Datasources>) -> HttpResponse {
 #[get("/about")]
 pub fn about(ds: web::Data<Datasources>) -> HttpResponse {
     let data = json!({
-        "full_name": constants::MY_NAME
+        "full_name": &ds.conf().site_author
     });
     let body = ds.handlebars().render("about", &data).unwrap();
     HttpResponse::Ok().content_type(constants::HTML_CONTENT_TYPE).body(body)
@@ -40,8 +40,8 @@ pub fn about(ds: web::Data<Datasources>) -> HttpResponse {
 #[get("/contact")]
 pub fn contact(ds: web::Data<Datasources>) -> HttpResponse {
     let data = json!({
-        "email": constants::MY_EMAIL,
-        "twitter_handle": constants::MY_TWITTER_HANDLE
+        "email": &ds.conf().author_email,
+        "twitter_handle": &ds.conf().author_twitter
     });
     let body = ds.handlebars().render("contact", &data).unwrap();
     HttpResponse::Ok().content_type(constants::HTML_CONTENT_TYPE).body(body)
