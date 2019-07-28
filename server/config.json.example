@@ -1,0 +1,9 @@
+{
+  "site_domain": "example.com",
+  "site_author": "John Titor",
+  "author_twitter": "john_titor",
+  "author_email": "john_titor@example.com",
+  "author_github_name": "john_titor",
+  "port": 8080,
+  "host": "0.0.0.0"
+}
