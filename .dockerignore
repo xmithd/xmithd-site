@@ -1,2 +1,4 @@
 build_prod.sh
 target/
+Dockerfile
+config.json.example

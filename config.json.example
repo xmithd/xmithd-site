@@ -4,6 +4,6 @@
   "author_twitter": "john_titor",
   "author_email": "john_titor@example.com",
   "author_github_name": "john_titor",
-  "port": 8080,
+  "port": 3001,
   "host": "0.0.0.0"
 }
