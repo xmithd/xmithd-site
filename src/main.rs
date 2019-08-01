@@ -15,22 +15,12 @@ use actix_files as fs;
 #[macro_use]
 extern crate actix_web;
 
-use actix_web::{web, App, HttpServer, Result};
+use actix_web::{web, App, HttpServer};
 use actix_web::middleware::Logger;
 
 #[macro_use]
 extern crate serde_json;
 extern crate serde_derive;
-
-fn render_file(file_name: &str) -> Result<fs::NamedFile> {
-  let file = fs::NamedFile::open(file_name)?;
-  Ok(file)
-}
-
-fn ui_app(webapp_root: &str) -> Result<fs::NamedFile> {
-  let index_path= format!("{}/index.html", webapp_root);
-  render_file(&index_path)
-}
 
 fn main() -> io::Result<()> {
   env_logger::init();
@@ -50,8 +40,6 @@ fn main() -> io::Result<()> {
         .service(routes::apps)
         .service(routes::about)
         .service(routes::contact)
-        .service(web::resource("/chatapp").route(web::get().to(|| ui_app(constants::REALTIME_CHAT_APP_ROOT))))
-        .service(fs::Files::new("/chatapp", constants::REALTIME_CHAT_APP_ROOT))
         .service(fs::Files::new("/", constants::PUBLIC_FOLDER))
   })
   .bind(&addr)?
