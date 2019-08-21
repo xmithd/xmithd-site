@@ -85,6 +85,10 @@ nav a:hover {
     padding: 1rem;
 }
 
+.logo > img {
+    height: 100%;
+}
+
 .left-menu {
     grid-column: 1;
     align-self: center;

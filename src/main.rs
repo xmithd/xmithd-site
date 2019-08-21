@@ -22,6 +22,13 @@ use actix_web::middleware::Logger;
 extern crate serde_json;
 extern crate serde_derive;
 
+/*
+fn render_index(folder_path: &str) -> Result<fs::NamedFile> {
+  let file = fs::NamedFile::open(format!("{}/index.html", folder_path))?;
+  Ok(file)
+}
+*/
+
 fn main() -> io::Result<()> {
   env_logger::init();
   let state = data::Datasources::new();
@@ -40,6 +47,7 @@ fn main() -> io::Result<()> {
         .service(routes::apps)
         .service(routes::about)
         .service(routes::contact)
+        //.service(web::resource("/").route(web::get().to(|| render_index(constants::PUBLIC_FOLDER))))
         .service(fs::Files::new("/", constants::PUBLIC_FOLDER))
   })
   .bind(&addr)?
