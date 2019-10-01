@@ -1,6 +1,6 @@
 # Cargo build stage to build dependencies separately
 
-FROM rust:1.36 as builder
+FROM rust:latest as builder
 
 RUN apt-get update
 RUN apt-get install musl-tools -y
