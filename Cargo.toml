@@ -1,6 +1,6 @@
 [package]
 name = "xmithd_backend"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["Amit Dayaram <amit.hotchandanidayaram@mcgill.ca>"]
 edition = "2018"
 

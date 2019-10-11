@@ -1754,7 +1754,7 @@ dependencies = [
 
 [[package]]
 name = "xmithd_backend"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "actix-files 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "actix-web 1.0.8 (registry+https://github.com/rust-lang/crates.io-index)",

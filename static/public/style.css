@@ -50,7 +50,6 @@ html, body {
 }
 
 nav {
-    max-width: 1720px;
     margin: 0 auto;
     font-family: "connectionregular", monospace;
     display: grid;
