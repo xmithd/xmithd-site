@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Build the Docker image
-      run: echo ${{ secrets.SITE_CONFIG }} > config.json && docker build . --file Dockerfile --tag xmithd/website
+      run: echo '${{ secrets.SITE_CONFIG }}' > config.json && docker build . --file Dockerfile --tag xmithd/website
     
     - name: Publish to Registry
       uses: elgohr/Publish-Docker-Github-Action@master
