@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Docker Image CI/CD
 
 on: [push]
 
@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
  
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v1
     - name: Build the Docker image
       run: echo '${{ secrets.SITE_CONFIG }}' > config.json && docker build . --file Dockerfile --tag xmithd/website
     
@@ -20,3 +20,13 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         snapshot: true
+
+    - name: Deploy to server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        port: ${{ secrets.SSH_PORT }}
+        script_stop: true
+        script: ./deploy.sh
+

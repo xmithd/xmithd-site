@@ -33,8 +33,6 @@ On my setup, I have NGINX as a reverse proxy. NGINX can host SPA apps and use th
 
 ## Deployment
 
-TODO: Automate the deployment.
-
 ### On the build machine
 
 Make sure `config.json` is set with the right values. It will get copied to the docker image.
