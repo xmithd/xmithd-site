@@ -2,3 +2,6 @@ build_prod.sh
 target/
 Dockerfile
 config.json.example
+.git/
+.github/
+.dockerignore
