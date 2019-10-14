@@ -38,10 +38,9 @@ html, body {
 }
 
 .burger-menu {
-    grid-column: 1;
+    grid-column: 3;
     align-self: center;
-    margin-left: 15px;
-    width: 32px;
+    margin-right: 15px;
 }
 
 .nav-container {
@@ -67,9 +66,9 @@ nav a:hover {
     opacity: .7;
 }
 
-.left-menu a {
+.right-menu a {
     padding: 10px 0;
-    margin-left: 15px;
+    margin-right: 15px;
     font-size: 14px;
     font-weight: 300;
     letter-spacing: 0.5px;
@@ -87,21 +86,31 @@ nav a:hover {
     height: 100%;
 }
 
-.left-menu {
-    grid-column: 1;
+.right-menu {
+    grid-column: 3;
     align-self: center;
+    text-align: right;
 }
 
 @media only screen and (max-width: 1025px) {
+
     .burger-menu {
         display: inline-block;
+        text-align: right;
     }
 
-    .left-menu {
+    .right-menu {
         display: none;
+        grid-column: 1;
+        text-align: left;
     }
 
-    #nav-toggle:checked ~ .left-menu {
+    .right-menu a {
+        margin-right: 0px;
+        margin-left: 15px;
+    }
+
+    #nav-toggle:checked ~ .right-menu {
         display: grid;
         grid-row: 2;
     }
