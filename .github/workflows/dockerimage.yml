@@ -17,7 +17,7 @@ jobs:
       run: echo '${{ secrets.SITE_CONFIG }}' > config.json && docker build . --file Dockerfile --tag xmithd/website
     
     - name: Publish to Registry
-      uses: elgohr/Publish-Docker-Github-Action@master
+      uses: elgohr/Publish-Docker-Github-Action@2.6
       with:
         name: xmithd/website
         username: ${{ secrets.DOCKER_USERNAME }}
@@ -25,7 +25,7 @@ jobs:
         snapshot: true
 
     - name: Deploy to server
-      uses: appleboy/ssh-action@master
+      uses: appleboy/ssh-action@v0.0.4
       with:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USER }}
