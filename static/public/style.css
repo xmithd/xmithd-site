@@ -41,6 +41,7 @@ html, body {
     grid-column: 3;
     align-self: center;
     margin-right: 15px;
+    grid-row: 1;
 }
 
 .nav-container {
@@ -74,6 +75,14 @@ nav a:hover {
     letter-spacing: 0.5px;
 }
 
+.left-menu a {
+    padding: 10px 0;
+    margin-left: 15px;
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+}
+
 .logo {
     grid-column: 2;
     color: black;
@@ -92,6 +101,12 @@ nav a:hover {
     text-align: right;
 }
 
+.left-menu {
+    grid-column: 1;
+    align-self: center;
+    text-align: left;
+}
+
 @media only screen and (max-width: 1025px) {
 
     .burger-menu {
@@ -99,20 +114,27 @@ nav a:hover {
         text-align: right;
     }
 
-    .right-menu {
+    .left-menu {
         display: none;
         grid-column: 1;
+        grid-row: 2;
         text-align: left;
     }
 
-    .right-menu a {
+    .right-menu {
+        display: none;
+        grid-column: 1;
+        grid-row: 3;
+        text-align: left;
+    }
+
+    .right-menu,.left-menu a {
         margin-right: 0px;
         margin-left: 15px;
     }
 
-    #nav-toggle:checked ~ .right-menu {
+    #nav-toggle:checked ~ .right-menu, #nav-toggle:checked ~ .left-menu {
         display: grid;
-        grid-row: 2;
     }
 }
 
