@@ -1,6 +1,7 @@
 mod constants;
 mod routes;
 mod data;
+mod entity;
 
 use std::{io};
 
@@ -18,9 +19,9 @@ extern crate actix_web;
 use actix_web::{web, App, HttpServer};
 use actix_web::middleware::Logger;
 
-#[macro_use]
-extern crate serde_json;
-extern crate serde_derive;
+//#[macro_use]
+//extern crate serde_json;
+//extern crate serde_derive;
 
 /*
 fn render_index(folder_path: &str) -> Result<fs::NamedFile> {
@@ -47,6 +48,8 @@ fn main() -> io::Result<()> {
         .service(routes::apps)
         .service(routes::about)
         .service(routes::contact)
+        //.service(routes::close_db)
+        .service(routes::user_list)
         //.service(web::resource("/").route(web::get().to(|| render_index(constants::PUBLIC_FOLDER))))
         .service(fs::Files::new("/", constants::PUBLIC_FOLDER))
   })

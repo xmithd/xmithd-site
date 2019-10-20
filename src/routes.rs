@@ -3,6 +3,10 @@ use actix_web::{web, HttpResponse};
 
 use super::constants;
 use super::data::Datasources;
+use super::entity::User;
+
+use log::{debug};
+use serde_json::json;
 
 // TODO add proper error handling
 
@@ -46,3 +50,23 @@ pub fn contact(ds: web::Data<Datasources>) -> HttpResponse {
     let body = ds.handlebars().render("contact", &data).unwrap();
     HttpResponse::Ok().content_type(constants::HTML_CONTENT_TYPE).body(body)
 }
+
+#[get("/users")]
+pub fn user_list(ds: web::Data<Datasources>) -> HttpResponse {
+    let users: Vec<User> = ds.db().get_users().or_else( |_: rusqlite::Error| -> Result<Vec<User>, String> {
+        debug!("No users");
+        Ok(Vec::new())
+    }).unwrap();
+    let body = serde_json::to_string(&users).unwrap(); //format!("{}", json!(users));
+    HttpResponse::Ok().content_type(constants::JSON_CONTENT_TYPE).body(body)
+}
+
+/*#[get("/close_db")]
+pub fn close_db(ds: web::Data<Datasources>) -> HttpResponse {
+    let op = ds.db().close();
+    let body = match op {
+        Ok(_) => "DB closed!",
+        Err(reason) => reason
+    };
+    HttpResponse::Ok().content_type("text/plain").body(body.to_string())
+}*/
