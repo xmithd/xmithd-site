@@ -13,4 +13,7 @@ serde = "1.0"
 serde_json = "1.0"
 handlebars = "2.0"
 serde_derive = "1.0"
-rusqlite = "0.20"
+
+[dependencies.rusqlite]
+version = "0.20.0"
+features = ["bundled"]

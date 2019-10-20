@@ -8,8 +8,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Install libsqlite3
-      run: sudo apt install libsqlite3-0
     - uses: actions/checkout@v1
     - name: Build
       run: cargo build --verbose
