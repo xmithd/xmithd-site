@@ -50,6 +50,7 @@ fn main() -> io::Result<()> {
         .service(routes::contact)
         //.service(routes::close_db)
         .service(routes::user_list)
+        .service(routes::post_raw)
         //.service(web::resource("/").route(web::get().to(|| render_index(constants::PUBLIC_FOLDER))))
         .service(fs::Files::new("/", constants::PUBLIC_FOLDER))
   })

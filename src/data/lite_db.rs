@@ -15,7 +15,7 @@ pub struct LiteDB {
 
 impl LiteDB {
     pub fn load(file: &str) -> Self {
-        let conn = Mutex::new(Connection::open(file.clone()).expect("Unable to connect to db file!"));
+        let conn = Mutex::new(Connection::open(&file).expect("Unable to connect to db file!"));
         Self {
             conn
         }
@@ -68,6 +68,28 @@ impl LiteDB {
             list.push(val);
         }
         Ok(list)
+    }
+
+    /**
+     * Gets the raw text field
+     */
+    pub fn get_raw_post_by_id(&self, id: i32) -> Option<String> {
+        let conn = self.conn.lock().unwrap();
+        let res: rusqlite::Result<String> = conn.query_row("SELECT content FROM post WHERE id=?1", params![id],
+                                 |row| -> rusqlite::Result<String> {
+                                     Ok(row.get_unwrap(0))
+                                 }
+        );
+        let ret = match res {
+            Ok(val) => {
+                Some(val)
+            },
+            Err(e) => {
+                error!("Error getting raw post: {}", e);
+                None
+            }
+        };
+        ret
     }
 
     fn check_table(conn: &Connection, table: &str) -> Option<()> {

@@ -8,6 +8,8 @@ use super::entity::User;
 use log::{debug};
 use serde_json::json;
 
+use pulldown_cmark::{Parser, Options, html};
+
 // TODO add proper error handling
 
 #[get("/")]
@@ -59,6 +61,29 @@ pub fn user_list(ds: web::Data<Datasources>) -> HttpResponse {
     }).unwrap();
     let body = serde_json::to_string(&users).unwrap(); //format!("{}", json!(users));
     HttpResponse::Ok().content_type(constants::JSON_CONTENT_TYPE).body(body)
+}
+
+#[get("/post/{id}")]
+pub fn post_raw(ds: web::Data<Datasources>, info: web::Path<i32>) -> HttpResponse {
+    let post = ds.db().get_raw_post_by_id(info.into_inner());
+    match post {
+        Some(data) => {
+            let mut options = Options::empty();
+            options.insert(Options::ENABLE_STRIKETHROUGH);
+            let parser = Parser::new_ext(&data, options);
+            let mut html_output = String::new();
+            html::push_html(&mut html_output, parser);
+            //HttpResponse::Ok().content_type("text/plain").body(data)
+            let data = json!({
+                "raw_post": &html_output
+            });
+            let body = ds.handlebars().render("single_post", &data).unwrap();
+            HttpResponse::Ok().content_type(constants::HTML_CONTENT_TYPE).body(body)
+        },
+        None => {
+            HttpResponse::NotFound().body("Post Not Found".to_string())
+        }
+    }
 }
 
 /*#[get("/close_db")]
