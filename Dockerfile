@@ -25,13 +25,17 @@ RUN RUSTFLAGS=-Clinker=musl-gcc cargo build --release --target=x86_64-unknown-li
 
 FROM alpine:latest
 
+# Not needed because sqlite is bundled
+# RUN apk update \
+#    && apk add sqlite
+
 RUN addgroup -g 1000 xmithd
 
 RUN adduser -D -s /bin/sh -u 1000 -G xmithd xmithd
 
 WORKDIR /home/xmithd/bin/
 
-RUN mkdir static
+RUN mkdir static && mkdir database
 
 COPY --from=builder /usr/src/app/target/x86_64-unknown-linux-musl/release/xmithd_backend .
 COPY ./static/ ./static/
@@ -42,5 +46,6 @@ RUN chown xmithd:xmithd xmithd_backend
 RUN chown -R xmithd:xmithd static
 ENV RUST_LOG="xmithd_backend=debug,actix_web=info"
 EXPOSE 3001
+VOLUME /home/xmithd/bin/database
 
 CMD ["./xmithd_backend"]
