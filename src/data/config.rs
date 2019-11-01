@@ -18,7 +18,8 @@ pub struct Config {
     pub author_github_name: String,
     pub port: u32,
     pub host: String,
-    pub db_file: String
+    pub db_file: String,
+    pub static_files: String,
 }
 
 impl Config {

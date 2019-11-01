@@ -35,7 +35,7 @@ fn main() -> io::Result<()> {
   let state = data::Datasources::new();
   let addr = format!("{}:{}", state.conf().host, state.conf().port);
   info!("Starting http server at http://{}", &addr);
-
+  let static_files_path = String::from(&state.conf().static_files);
   let datasources_ref = web::Data::new(state);
 
   // TODO add error handling middleware
@@ -52,6 +52,7 @@ fn main() -> io::Result<()> {
         .service(routes::user_list)
         .service(routes::post_raw)
         //.service(web::resource("/").route(web::get().to(|| render_index(constants::PUBLIC_FOLDER))))
+        .service(fs::Files::new("/public/", &static_files_path))
         .service(fs::Files::new("/", constants::PUBLIC_FOLDER))
   })
   .bind(&addr)?
