@@ -6,8 +6,8 @@
   {{>site_header}}
   <main>
   <article>
-    <h1>TODO post title</h1>
-    <h3>TODO author, TODO date</h3>
+    <h1>{{title}}</h1>
+    <h3>TODO author, <i class="xm_timestamp">{{created}}</i></h3>
     {{{raw_post}}}
     </article>
   </main>
@@ -16,5 +16,16 @@
   <link rel="stylesheet" type="text/css" href="/public/styles/solarized-dark.css">
   <script src="/public/libs/highlight.pack.js"></script>
   <script>hljs.initHighlightingOnLoad();</script>
+<script>
+  const dateElements = document.getElementsByClassName('xm_timestamp');
+  for (element of dateElements) {
+    const val = parseInt(element.innerHTML, 10);
+    if (!isNaN(val)) {
+      const dateVal = new Date(val);
+      // Quick way to display YYYY-MM-DD format.
+      element.innerHTML = dateVal.toString();
+    }
+  }
+</script>
 </body>
 </html>

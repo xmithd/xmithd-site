@@ -63,19 +63,22 @@ pub fn user_list(ds: web::Data<Datasources>) -> HttpResponse {
     HttpResponse::Ok().content_type(constants::JSON_CONTENT_TYPE).body(body)
 }
 
-#[get("/post/{id}")]
+#[get("/blog/post/{id}")]
 pub fn post_raw(ds: web::Data<Datasources>, info: web::Path<i32>) -> HttpResponse {
-    let post = ds.db().get_raw_post_by_id(info.into_inner());
+    let post = ds.db().get_post_by_id(info.into_inner());
     match post {
         Some(data) => {
             let mut options = Options::empty();
             options.insert(Options::ENABLE_STRIKETHROUGH);
-            let parser = Parser::new_ext(&data, options);
+            let parser = Parser::new_ext(&data.content, options);
             let mut html_output = String::new();
             html::push_html(&mut html_output, parser);
             //HttpResponse::Ok().content_type("text/plain").body(data)
             let data = json!({
-                "raw_post": &html_output
+              "raw_post": &html_output,
+              "title": &data.ident.title,
+              "created": &data.ident.created,
+              "updated": &data.updated
             });
             let body = ds.handlebars().render("single_post", &data).unwrap();
             HttpResponse::Ok().content_type(constants::HTML_CONTENT_TYPE).body(body)
@@ -88,14 +91,11 @@ pub fn post_raw(ds: web::Data<Datasources>, info: web::Path<i32>) -> HttpRespons
 
 #[get("/blog")]
 pub fn blog(ds: web::Data<Datasources>) -> HttpResponse {
-    //
+    // TODO get offset and limit from the request query params...
     let posts: Vec<PostIdent> = ds.db().get_posts(10,0).or_else(|_: rusqlite::Error| -> Result<Vec<PostIdent>, String> {
         debug!("No posts");
         Ok(Vec::new())
     }).unwrap();
-    /*let data = json!({
-        posts: posts
-    });*/
     let body = ds.handlebars().render("blog", &posts).unwrap();
     HttpResponse::Ok().content_type(constants::HTML_CONTENT_TYPE).body(body)
 }

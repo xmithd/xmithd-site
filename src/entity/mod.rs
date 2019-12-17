@@ -20,3 +20,15 @@ pub struct PostIdent {
     // (ms since Unix epoch - but only accurate to the second)
     pub created: i64,
 }
+
+pub struct Post {
+    // post ident info
+    pub ident: PostIdent,
+
+    // markdown content
+    pub content: String,
+
+    // Timestamp when it was last updated
+    // (ms since Unix epoch - but only accurate to the second)
+    pub updated: i64,
+}

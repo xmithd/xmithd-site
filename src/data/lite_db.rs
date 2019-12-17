@@ -4,7 +4,7 @@ use rusqlite::{Connection, params, NO_PARAMS};
 use log::{error,debug, info};
 use std::sync::Mutex;
 
-use super::super::entity::{User, PostIdent};
+use super::super::entity::{User, PostIdent, Post};
 
 // Struct for interacting with a SQLite database
 pub struct LiteDB {
@@ -71,21 +71,40 @@ impl LiteDB {
     }
 
     /**
-     * Gets the raw text field
+     * Get post by id
      */
-    pub fn get_raw_post_by_id(&self, id: i32) -> Option<String> {
+    pub fn get_post_by_id(&self, id: i32) -> Option<Post> {
         let conn = self.conn.lock().unwrap();
-        let res: rusqlite::Result<String> = conn.query_row("SELECT content FROM post WHERE id=?1", params![id],
-                                 |row| -> rusqlite::Result<String> {
-                                     Ok(row.get_unwrap(0))
-                                 }
+        let res: rusqlite::Result<Post> = conn.query_row("SELECT id, title, strftime(\"%s\", created_at) as created_at, content, strftime(\"%s\", updated_at) as updated_at FROM post WHERE id=?1",
+                 params![id],
+                |row| -> rusqlite::Result<Post> {
+                    let created_at: String = row.get_unwrap(2);
+                    let updated_at: String = row.get_unwrap(4);
+                       Ok(
+                           Post {
+                               ident: PostIdent {
+                                   id: row.get_unwrap(0),
+                                   title: row.get_unwrap(1),
+                                   created: created_at.parse::<i64>().or_else( |e| -> Result<i64, ()> {
+                                       info!("Created at cannot be read. {}, returning 0", e);
+                                       Ok(0 as i64)
+                                   }).unwrap() * 1000,
+                               },
+                               updated: updated_at.parse::<i64>().or_else( |e| -> Result<i64, ()> {
+                                   info!("Updated at cannot be read. {}, returning 0", e);
+                                   Ok(0 as i64)
+                               }).unwrap() * 1000,
+                               content: row.get_unwrap(3),
+                           }
+                       )
+                   }
         );
         let ret = match res {
             Ok(val) => {
                 Some(val)
             },
             Err(e) => {
-                error!("Error getting raw post: {}", e);
+                error!("Error getting post: {}", e);
                 None
             }
         };
