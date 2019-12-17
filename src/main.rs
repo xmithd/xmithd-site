@@ -48,6 +48,7 @@ fn main() -> io::Result<()> {
         .service(routes::apps)
         .service(routes::about)
         .service(routes::contact)
+        .service(routes::blog)
         //.service(routes::close_db)
         .service(routes::user_list)
         .service(routes::post_raw)

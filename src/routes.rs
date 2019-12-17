@@ -3,7 +3,7 @@ use actix_web::{web, HttpResponse};
 
 use super::constants;
 use super::data::Datasources;
-use super::entity::User;
+use super::entity::{User, PostIdent};
 
 use log::{debug};
 use serde_json::json;
@@ -84,6 +84,20 @@ pub fn post_raw(ds: web::Data<Datasources>, info: web::Path<i32>) -> HttpRespons
             HttpResponse::NotFound().body("Post Not Found".to_string())
         }
     }
+}
+
+#[get("/blog")]
+pub fn blog(ds: web::Data<Datasources>) -> HttpResponse {
+    //
+    let posts: Vec<PostIdent> = ds.db().get_posts(10,0).or_else(|_: rusqlite::Error| -> Result<Vec<PostIdent>, String> {
+        debug!("No posts");
+        Ok(Vec::new())
+    }).unwrap();
+    /*let data = json!({
+        posts: posts
+    });*/
+    let body = ds.handlebars().render("blog", &posts).unwrap();
+    HttpResponse::Ok().content_type(constants::HTML_CONTENT_TYPE).body(body)
 }
 
 /*#[get("/close_db")]

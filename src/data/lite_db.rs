@@ -4,7 +4,7 @@ use rusqlite::{Connection, params, NO_PARAMS};
 use log::{error,debug, info};
 use std::sync::Mutex;
 
-use super::super::entity::User;
+use super::super::entity::{User, PostIdent};
 
 // Struct for interacting with a SQLite database
 pub struct LiteDB {
@@ -92,6 +92,40 @@ impl LiteDB {
         ret
     }
 
+    /**
+     * Gets the list of posts (sorted by date created, descending)
+     */
+    pub fn get_posts(&self, limit: i32, offset: i32) -> rusqlite::Result<Vec<PostIdent>> {
+        let conn = self.conn.lock().unwrap();
+        let mut stmt = conn.prepare("SELECT id, title, strftime(\"%s\", created_at) as created_at FROM post ORDER BY created_at DESC LIMIT ?1 OFFSET ?2")?;
+        let ret = stmt.query_map(params![limit, offset], |row| -> rusqlite::Result<PostIdent> {
+            debug!("Fetched PostIdent row...");
+            // created_at is read as string.
+            // represents unix time in seconds.
+            let created_at: String = row.get_unwrap(2);
+            debug!("Created at: {}", created_at);
+            Ok(
+                PostIdent {
+                    id: row.get_unwrap(0),
+                    title: row.get_unwrap(1),
+                    created: created_at.parse::<i64>().or_else( |e| -> Result<i64, ()> {
+                        info!("Created at cannot be read. {}, returning 0", e);
+                        Ok(0 as i64)
+                    }).unwrap() * 1000,
+                }
+            )
+        }).or_else(|e: rusqlite::Error| {
+            error!("Error, {}", e);
+            Err(e)
+        })?;
+        // TODO use collect?
+        let mut items = Vec::new();
+        for item in ret {
+            items.push(item.unwrap());
+        }
+        Ok(items)
+    }
+
     fn check_table(conn: &Connection, table: &str) -> Option<()> {
         let res = conn.query_row("SELECT name FROM sqlite_master WHERE type='table' AND name=?1",
                                  params![table],
@@ -145,4 +179,6 @@ COMMIT;
             }
         )
     }
+
+
 }

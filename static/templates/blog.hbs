@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+{{>html_header}}
+<body>
+<div class="content-area">
+  {{>site_header}}
+  <main>
+    <h1>Blog</h1>
+    <ul>
+    {{#each .}}
+      <p><i class="xm_timestamp">{{this.created}}</i>&nbsp;<a href="/post/{{this.id}}">{{this.title}}</a></p>
+    {{/each}}
+    </ul>
+  </main>
+  {{>site_footer}}
+  <script>
+    const dateElements = document.getElementsByClassName('xm_timestamp');
+    for (element of dateElements) {
+      const val = parseInt(element.innerHTML, 10);
+      if (!isNaN(val)) {
+          const dateVal = new Date(val);
+          // Quick way to display YYYY-MM-DD format.
+          element.innerHTML = dateVal.toLocaleDateString('zu');
+      }
+    }
+  </script>
+</div>
+</body>
+</html>
