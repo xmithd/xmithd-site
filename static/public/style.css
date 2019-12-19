@@ -91,6 +91,10 @@ nav a:hover {
     padding: 1rem;
 }
 
+i.date_created {
+    font-size: 12px;
+}
+
 .logo > img {
     height: 100%;
 }
