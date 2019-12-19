@@ -92,7 +92,8 @@ pub fn post_raw(ds: web::Data<Datasources>, info: web::Path<i32>) -> HttpRespons
 #[get("/blog")]
 pub fn blog(ds: web::Data<Datasources>) -> HttpResponse {
     // TODO get offset and limit from the request query params...
-    let posts: Vec<PostIdent> = ds.db().get_posts(10,0).or_else(|_: rusqlite::Error| -> Result<Vec<PostIdent>, String> {
+    // current limit: 1000 posts which I won't reach anytime soon.
+    let posts: Vec<PostIdent> = ds.db().get_posts(1000,0).or_else(|_: rusqlite::Error| -> Result<Vec<PostIdent>, String> {
         debug!("No posts");
         Ok(Vec::new())
     }).unwrap();
