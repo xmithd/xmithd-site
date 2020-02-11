@@ -7,7 +7,7 @@
   <main>
     <h1>Blog</h1>
     <ul>
-    {{#each .}}
+    {{#each posts}}
       <p><i class="xm_timestamp">{{this.created}}</i>&nbsp;<a href="/blog/post/{{this.id}}">{{this.title}}</a></p>
     {{/each}}
     </ul>

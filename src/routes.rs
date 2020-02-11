@@ -97,7 +97,10 @@ pub fn blog(ds: web::Data<Datasources>) -> HttpResponse {
         debug!("No posts");
         Ok(Vec::new())
     }).unwrap();
-    let body = ds.handlebars().render("blog", &posts).unwrap();
+    let data = json!({
+        "posts": &posts
+    });
+    let body = ds.handlebars().render("blog", &data).unwrap();
     HttpResponse::Ok().content_type(constants::HTML_CONTENT_TYPE).body(body)
 }
 
