@@ -1,3 +1,5 @@
+This is the repository for my personal site: xmithd.com
+
 ## Deployment instructions
 Docker has been added to ease deployment.
 Copy config.json.example to config.json and add your custom information.
@@ -25,7 +27,7 @@ RUST_LOG=xmithd_backend=debug,actix_web=info cargo run
 ```
 
 That's it!
-Note that the log outputs in the standard output.
+Note that the log outputs in the standard error output.
 Feel free to customize from here :)
 
 ## Note
@@ -68,8 +70,9 @@ $ docker container rm xmithd.com
 ```
 
 Run the container 😁
+(notice, I run it with 2 volumes - one is for external files (images, static assets that I don't want in git, etc...) and the other one is for the database.)
 ```
-$ docker run -d --restart=unless-stopped --name xmithd.com -p 3001:3001 xmithd/website:1.0.1
+$ docker run -d --restart=unless-stopped --name xmithd.com -p 3001:3001 -v $HOME/database:/path/to/container/database -v $HOME/external_files:/path/to/container/external_files xmithd/website:1.0.1
 ```
 Get the logs
 ```

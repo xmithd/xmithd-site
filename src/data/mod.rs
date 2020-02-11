@@ -5,13 +5,13 @@ mod lite_db;
 use config::Config;
 use lite_db::LiteDB;
 
-pub struct Datasources {
-    hb: handlebars::Handlebars,
+pub struct Datasources<'a> {
+    hb: handlebars::Handlebars<'a>,
     config: Config,
     db: LiteDB
 }
 
-impl Datasources {
+impl Datasources<'_> {
     pub fn new() -> Self {
         // Handlebars uses a repository for the compiled templates. This object must be
         // shared between the application threads, and is therefore passed to the
