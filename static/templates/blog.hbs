@@ -16,16 +16,6 @@
   </main>
   {{>site_footer}}
 </div>
-<script>
-  const dateElements = document.getElementsByClassName('xm_timestamp');
-  for (element of dateElements) {
-    const val = parseInt(element.innerHTML, 10);
-    if (!isNaN(val)) {
-      const dateVal = new Date(val);
-      // Quick way to display YYYY-MM-DD format.
-      element.innerHTML = dateVal.toLocaleDateString('zu');
-    }
-  }
-</script>
+<script src="/scripts/xmithd.js"></script>
 </body>
 </html>
