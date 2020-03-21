@@ -8,19 +8,34 @@ function debugln(msg) {
     debug.innerHTML += (msg) + '<br/>\n';
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+function displayLocalDates() {
   const dateElements = document.getElementsByClassName('xm_timestamp');
   debugln("size = " + dateElements.length);
   for (const element of dateElements) {
-    const numstr = element.innerHTML;
-    debugln("numstr = " + numstr);
-    const value = parseInt(numstr, 10);
-    debugln("value: " + value);
+    let timestampStr = element.innerHTML;
+    const localeIdx = timestampStr.indexOf('-');
+    let locale = undefined;
+    if (localeIdx !== -1) {
+      locale = timestampStr.substr(0, localeIdx);
+      debugln('locale = ' + locale );
+      timestampStr = timestampStr.substr(localeIdx+1, timestampStr.length-localeIdx+1);
+    }
+    debugln("timestampStr = " + timestampStr);
+    const value = parseInt(timestampStr, 10);
+    debugln("numeric value: " + value);
     if (!isNaN(value)) {
       let dateVal = new Date(value);
       // Quick way to display local date
-      debugln("dateVal " + dateVal.toISOString() );
-      element.innerHTML = dateVal.toLocaleDateString('zu');
+      if (locale) {
+        element.innerHTML = dateVal.toLocaleDateString('zu');
+      } else {
+        element.innerHTML = dateVal.toString();
+      }
     }
   }
+
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  displayLocalDates();
 });
