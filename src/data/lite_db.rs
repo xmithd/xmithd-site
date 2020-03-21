@@ -11,6 +11,64 @@ pub struct LiteDB {
     conn: Mutex<Connection>,
 }
 
+const BLOG_TABLES_SQL: &str = "BEGIN;
+CREATE TABLE user(
+  id INTEGER PRIMARY KEY,
+  username TEXT UNIQUE NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  is_admin INTEGER NOT NULL
+);
+
+CREATE TABLE post(
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  content TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  author_id INTEGER NOT NULL,
+  FOREIGN KEY(author_id) REFERENCES user(id) ON DELETE CASCADE
+);
+
+CREATE TABLE tag(
+  id INTEGER PRIMARY KEY,
+  name TEXT UNIQUE NOT NULL
+);
+
+CREATE TABLE post_tag(
+  post_id INTEGER NOT NULL,
+  tag_id  INTEGER NOT NULL,
+  PRIMARY KEY(post_id, tag_id),
+  FOREIGN KEY(post_id) REFERENCES post(id) ON DELETE CASCADE,
+  FOREIGN KEY(tag_id) REFERENCES tag(id) ON DELETE CASCADE
+);
+
+COMMIT;
+";
+
+const CHAT_TABLES_SQL: &str = "BEGIN;
+CREATE TABLE chat_room(
+  id INTEGER PRIMARY KEY,
+  name TEXT
+);
+
+CREATE TABLE chat_message(
+  id INTEGER PRIMARY KEY,
+  content TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  user_id INTEGER NOT NULL,
+  FOREIGN KEY(user_id) REFERENCES user(id) ON DELETE CASCADE
+);
+
+CREATE TABLE chat_log(
+  message_id INTEGER NOT NULL,
+  room_id INTEGER NOT NULL,
+  PRIMARY KEY(message_id, room_id)
+  FOREIGN KEY(message_id) REFERENCES chat_message(id) ON DELETE CASCADE,
+  FOREIGN KEY(room_id) REFERENCES chat_room(id) ON DELETE CASCADE
+);
+COMMIT;
+";
 
 
 impl LiteDB {
@@ -38,10 +96,17 @@ impl LiteDB {
         let conn = self.conn.lock().expect("Failed to get handle on the connection");
         match Self::check_table(&conn, "user") {
             Some(_) => {
-                debug!("Tables already created!");
+                debug!("Blog Tables already created!");
                 Ok(())
             },
-            None => Self::create_tables(&conn)
+            None => Self::create_tables(&conn, BLOG_TABLES_SQL)
+        }?;
+        match Self::check_table(&conn, "chat_room") {
+            Some(_) => {
+                debug!("Chat tables already created!");
+                Ok(())
+            },
+            None => Self::create_tables(&conn, CHAT_TABLES_SQL)
         }
     }
 
@@ -157,42 +222,9 @@ impl LiteDB {
         return res;
     }
 
-    fn create_tables(conn: &Connection) -> Result<(), String> {
+    fn create_tables(conn: &Connection, sql: &str) -> Result<(), String> {
         info!("Creating tables...");
-        conn.execute_batch("BEGIN;
-CREATE TABLE user(
-  id INTEGER PRIMARY KEY,
-  username TEXT UNIQUE NOT NULL,
-  email TEXT UNIQUE NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  is_admin INTEGER NOT NULL
-);
-
-CREATE TABLE post(
-  id INTEGER PRIMARY KEY,
-  title TEXT,
-  content TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  author_id INTEGER NOT NULL,
-  FOREIGN KEY(author_id) REFERENCES user(id)
-);
-
-CREATE TABLE tag(
-  id INTEGER PRIMARY KEY,
-  name TEXT UNIQUE NOT NULL
-);
-
-CREATE TABLE post_tag(
-  post_id INTEGER NOT NULL,
-  tag_id  INTEGER NOT NULL,
-  PRIMARY KEY(post_id, tag_id),
-  FOREIGN KEY(post_id) REFERENCES post(id),
-  FOREIGN KEY(tag_id) REFERENCES tag(id)
-);
-
-COMMIT;
-").or_else( |e| {
+        conn.execute_batch(sql).or_else( |e| {
             error!("{}", e);
             Err(format!("Failed to create tables. {}", e))
             }
