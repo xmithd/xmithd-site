@@ -53,6 +53,13 @@ pub fn contact(ds: web::Data<Datasources>) -> HttpResponse {
     HttpResponse::Ok().content_type(constants::HTML_CONTENT_TYPE).body(body)
 }
 
+#[get("/echo")]
+pub fn echochat(ds: web::Data<Datasources>) -> HttpResponse {
+    let data = json!({"a": "b"});
+    let body = ds.handlebars().render("echo", &data).unwrap();
+    HttpResponse::Ok().content_type(constants::HTML_CONTENT_TYPE).body(body)
+}
+
 #[get("/users")]
 pub fn user_list(ds: web::Data<Datasources>) -> HttpResponse {
     let users: Vec<User> = ds.db().get_users().or_else( |_: rusqlite::Error| -> Result<Vec<User>, String> {

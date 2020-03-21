@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+{{>html_header}}
+<body>
+<div class="content-area">
+  {{>site_header}}
+  <main>
+    <h2>Echo chat!</h2>
+    <div>
+      <button id="connect">Connect</button>&nbsp;|&nbsp;Status:
+      <span id="status">disconnected</span>
+    </div>
+    <div id="log"
+         style="width:20em;height:15em;overflow:auto;border:1px solid black">
+    </div>
+    <form id="chatform" onsubmit="return false;">
+      <input id="text" type="text" />
+      <input id="send" type="button" value="Send" />
+    </form>
+  </main>
+  {{>site_footer}}
+</div>
+<script src="/scripts/xmithd.js"></script>
+</body>
+</html>
