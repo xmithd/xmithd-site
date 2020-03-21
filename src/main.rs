@@ -30,7 +30,8 @@ fn render_index(folder_path: &str) -> Result<fs::NamedFile> {
 }
 */
 
-fn main() -> io::Result<()> {
+#[actix_rt::main]
+async fn main() -> io::Result<()> {
   env_logger::init();
   let state = data::Datasources::new();
   let addr = format!("{}:{}", state.conf().host, state.conf().port);
@@ -43,7 +44,7 @@ fn main() -> io::Result<()> {
   HttpServer::new( move || {
     App::new()
         .wrap(Logger::new("%a %t \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T"))
-        .register_data(datasources_ref.clone())
+        .app_data(datasources_ref.clone())
         .service(routes::home)
         .service(routes::apps)
         .service(routes::about)
@@ -58,5 +59,6 @@ fn main() -> io::Result<()> {
   })
   .bind(&addr)?
   .run()
+  .await
 }
 
