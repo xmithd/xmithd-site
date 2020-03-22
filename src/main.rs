@@ -2,6 +2,7 @@ mod constants;
 mod routes;
 mod data;
 mod entity;
+mod websockets;
 
 use std::{io};
 
@@ -30,7 +31,8 @@ fn render_index(folder_path: &str) -> Result<fs::NamedFile> {
 }
 */
 
-fn main() -> io::Result<()> {
+#[actix_rt::main]
+async fn main() -> io::Result<()> {
   env_logger::init();
   let state = data::Datasources::new();
   let addr = format!("{}:{}", state.conf().host, state.conf().port);
@@ -43,7 +45,7 @@ fn main() -> io::Result<()> {
   HttpServer::new( move || {
     App::new()
         .wrap(Logger::new("%a %t \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T"))
-        .register_data(datasources_ref.clone())
+        .app_data(datasources_ref.clone())
         .service(routes::home)
         .service(routes::apps)
         .service(routes::about)
@@ -52,11 +54,14 @@ fn main() -> io::Result<()> {
         //.service(routes::close_db)
         .service(routes::user_list)
         .service(routes::post_raw)
+        .service(routes::simple_chat)
+        .service(web::resource("/ws").route(web::get().to(websockets::ws_index)))
         //.service(web::resource("/").route(web::get().to(|| render_index(constants::PUBLIC_FOLDER))))
         .service(fs::Files::new("/public/", &static_files_path))
         .service(fs::Files::new("/", constants::PUBLIC_FOLDER))
   })
   .bind(&addr)?
   .run()
+  .await
 }
 

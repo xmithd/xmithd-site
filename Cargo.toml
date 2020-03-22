@@ -1,18 +1,22 @@
 [package]
 name = "xmithd_backend"
-version = "1.0.2"
+version = "1.5.0"
 authors = ["Amit Dayaram <amit.hdayaram@gmail.com>"]
 edition = "2018"
 
 [dependencies]
 log = "0.4"
 env_logger = "0.7"
-actix-web = "1.0"
-actix-files = "0.1"
+actix = "0.9"
+actix-web = "2.0"
+actix-rt = "1.0"
+actix-files = "0.2"
+actix-web-actors = "2.0"
 serde = "1.0"
 serde_json = "1.0"
 serde_derive = "1.0"
 pulldown-cmark = "0.7"
+rand = "0.7"
 
 [dependencies.rusqlite]
 version = "0.21.0"

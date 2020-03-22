@@ -10,7 +10,7 @@ function debugln(msg) {
 
 function displayLocalDates() {
   const dateElements = document.getElementsByClassName('xm_timestamp');
-  debugln("size = " + dateElements.length);
+  debugln("local dates size = " + dateElements.length);
   for (const element of dateElements) {
     let timestampStr = element.innerHTML;
     const localeIdx = timestampStr.indexOf('-');
