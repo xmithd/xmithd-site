@@ -1,14 +1,21 @@
 use handlebars::Handlebars;
 mod config;
 mod lite_db;
+pub mod chat_broker;
 
 use config::Config;
 use lite_db::LiteDB;
+use chat_broker::ChatBroker;
+
+use log::{info};
+use actix::Actor;
+use actix::Addr;
 
 pub struct Datasources<'a> {
     hb: handlebars::Handlebars<'a>,
     config: Config,
-    db: LiteDB
+    db: LiteDB,
+    broker: Addr<ChatBroker>
 }
 
 impl Datasources<'_> {
@@ -24,10 +31,13 @@ impl Datasources<'_> {
         let config = Config::load();
         let db = LiteDB::load(&config.db_file);
         db.check_or_create_tables().expect("Failed to create tables!");
+        info!("Starting Chat broker...");
+        let broker = chat_broker::ChatBroker::default().start();
         Self {
             hb: handlebars,
             config,
-            db
+            db,
+            broker
         }
     }
 
@@ -41,5 +51,9 @@ impl Datasources<'_> {
 
     pub fn db(&self) -> &LiteDB {
         &self.db
+    }
+
+    pub fn broker(&self) -> &Addr<ChatBroker> {
+        &self.broker
     }
 }
