@@ -53,10 +53,10 @@ pub fn contact(ds: web::Data<Datasources>) -> HttpResponse {
     HttpResponse::Ok().content_type(constants::HTML_CONTENT_TYPE).body(body)
 }
 
-#[get("/echo")]
-pub fn echochat(ds: web::Data<Datasources>) -> HttpResponse {
+#[get("/simple_chat")]
+pub fn simple_chat(ds: web::Data<Datasources>) -> HttpResponse {
     let data = json!({"a": "b"});
-    let body = ds.handlebars().render("echo", &data).unwrap();
+    let body = ds.handlebars().render("simple_chat", &data).unwrap();
     HttpResponse::Ok().content_type(constants::HTML_CONTENT_TYPE).body(body)
 }
 

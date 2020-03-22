@@ -5,7 +5,7 @@ use actix::prelude::*;
 use actix_web::{web, HttpResponse, HttpRequest, Error};
 use actix_web_actors::ws;
 
-use log::{info, debug, error};
+use log::{info, debug, error, trace};
 use super::data::Datasources;
 
 use super::data::chat_broker;
@@ -106,7 +106,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWebSocket<'stat
             },
             Ok(msg) => msg,
         };
-        info!("WS message: {:?}", msg);
+        trace!("WS message: {:?}", msg);
         match msg {
             ws::Message::Ping(msg) => {
                 self.hb = Instant::now();

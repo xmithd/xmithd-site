@@ -54,7 +54,7 @@ async fn main() -> io::Result<()> {
         //.service(routes::close_db)
         .service(routes::user_list)
         .service(routes::post_raw)
-        .service(routes::echochat)
+        .service(routes::simple_chat)
         .service(web::resource("/ws").route(web::get().to(websockets::ws_index)))
         //.service(web::resource("/").route(web::get().to(|| render_index(constants::PUBLIC_FOLDER))))
         .service(fs::Files::new("/public/", &static_files_path))

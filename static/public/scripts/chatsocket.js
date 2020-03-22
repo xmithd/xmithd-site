@@ -33,16 +33,16 @@ function setUpEchoFunction() {
         disconnect();
         const wsUri = (window.location.protocol==='https:'&&'wss://'||'ws://')+ window.location.host + '/ws';
         conn = new WebSocket(wsUri);
-        log('Connecting...');
+        log('<i>Connecting...</i>');
         conn.onopen = function() {
-            log('Connected.');
+            log('<i>Connected.</i>');
             update_ui();
         };
         conn.onmessage = function(e) {
-            log('Received: ' + e.data);
+            log('&lt;&nbsp;' + e.data);
         };
         conn.onclose = function() {
-            log('Disconnected.');
+            log('<i>Disconnected.</i>');
             conn = null;
             update_ui();
         }
@@ -64,7 +64,7 @@ function setUpEchoFunction() {
     if (sendBtn) {
         sendBtn.addEventListener('click', () => {
             let text = textEl.value;
-            log('Sending: ' + text);
+            log('&gt;&nbsp;' + text);
             conn.send(text);
             textEl.value = '';
             textEl.focus();
