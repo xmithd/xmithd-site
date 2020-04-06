@@ -124,6 +124,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWebSocket<'stat
                         "/list" => {
                             // Send ListRooms message the chat broker and wait for response
                             debug!("List rooms");
+                            // it would be nice if we could await here:
                             self.data.broker().send(chat_broker::ListRooms)
                                 .into_actor(self)
                                 .then(|res, _, ctx| {
@@ -212,7 +213,7 @@ impl MyWebSocket<'static> {
         ctx.run_interval(HEARTBEAT_INTERVAL, |act, ctx| {
             // check client heartbeats
             if Instant::now().duration_since(act.hb) > CLIENT_TIMEOUT {
-                info!("Websocket Client hearbeat failed: disconnecting!");
+                info!("Websocket Client heartbeat failed: disconnecting!");
 
                 // stop actor
                 ctx.stop();
