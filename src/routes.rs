@@ -1,5 +1,5 @@
 
-use actix_web::{web, HttpResponse};
+use actix_web::{web, HttpResponse, HttpRequest};
 
 use super::constants;
 use super::data::Datasources;
@@ -109,6 +109,28 @@ pub fn blog(ds: web::Data<Datasources>) -> HttpResponse {
     });
     let body = ds.handlebars().render("blog", &data).unwrap();
     HttpResponse::Ok().content_type(constants::HTML_CONTENT_TYPE).body(body)
+}
+
+#[get("/utils/whatsmyip")]
+pub fn whatsmyip(req: HttpRequest) -> HttpResponse {
+    let ip_addr_op = req.peer_addr().map(|t| {
+        t.ip()
+    });
+    if let Some(ip_addr) = ip_addr_op {
+        let body = match req.headers().get("X-Real-IP") {
+            Some(addr) => {
+                let ret = match addr.to_str() {
+                    Ok(val) => String::from(val),
+                    Err(_) => format!("{}", ip_addr)
+                };
+                ret
+            },
+            None => format!("{}", ip_addr)
+        };
+        HttpResponse::Ok().content_type("text/plain").body(body)
+    } else {
+        HttpResponse::BadRequest().finish()
+    }
 }
 
 /*#[get("/close_db")]
