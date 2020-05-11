@@ -19,6 +19,7 @@ extern crate actix_web;
 
 use actix_web::{web, App, HttpServer};
 use actix_web::middleware::Logger;
+use env_logger::{Builder, Target};
 
 //#[macro_use]
 //extern crate serde_json;
@@ -33,7 +34,9 @@ fn render_index(folder_path: &str) -> Result<fs::NamedFile> {
 
 #[actix_rt::main]
 async fn main() -> io::Result<()> {
-  env_logger::init();
+  let mut log_builder = Builder::from_default_env();
+  log_builder.target(Target::Stdout);
+  log_builder.init();
   let state = data::Datasources::new();
   let addr = format!("{}:{}", state.conf().host, state.conf().port);
   info!("Starting http server at http://{}", &addr);
