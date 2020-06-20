@@ -9,7 +9,7 @@ log = "0.4"
 env_logger = "0.7"
 actix = "0.9"
 actix-web = "2.0"
-actix-rt = "1.0"
+actix-rt = "1.1"
 actix-files = "0.2"
 actix-web-actors = "2.0"
 serde = "1.0"
@@ -19,9 +19,9 @@ pulldown-cmark = "0.7"
 rand = "0.7"
 
 [dependencies.rusqlite]
-version = "0.21.0"
+version = "0.23.0"
 features = ["bundled"]
 
 [dependencies.handlebars]
-version = "3.0"
+version = "3.1"
 features = ["dir_source"]
