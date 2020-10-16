@@ -7,21 +7,21 @@ edition = "2018"
 [dependencies]
 log = "0.4"
 env_logger = "0.7"
-actix = "0.9"
-actix-web = "2.0"
+actix = "0.10"
+actix-web = "3.1"
 actix-rt = "1.1"
-actix-files = "0.2"
-actix-web-actors = "2.0"
+actix-files = "0.4"
+actix-web-actors = "3.0"
 serde = "1.0"
 serde_json = "1.0"
 serde_derive = "1.0"
-pulldown-cmark = "0.7"
+pulldown-cmark = "0.8"
 rand = "0.7"
 
 [dependencies.rusqlite]
-version = "0.23.0"
+version = "0.24.1"
 features = ["bundled"]
 
 [dependencies.handlebars]
-version = "3.1"
+version = "3.5"
 features = ["dir_source"]
