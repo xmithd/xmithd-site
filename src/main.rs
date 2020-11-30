@@ -47,7 +47,7 @@ async fn main() -> io::Result<()> {
 
   HttpServer::new( move || {
     App::new()
-        .wrap(Logger::new("%a %t \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T"))
+        .wrap(Logger::new("%{r}a %t \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T"))
         .app_data(datasources_ref.clone())
         .service(routes::home)
         .service(routes::apps)
