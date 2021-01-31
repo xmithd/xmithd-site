@@ -3,7 +3,8 @@ use actix_web::{web, HttpResponse, HttpRequest};
 
 use super::constants;
 use super::data::Datasources;
-use super::entity::{User, PostIdent};
+use super::data::solver::{compute};
+use super::entity::{User, PostIdent, CategoryResult};
 
 use log::{debug};
 use serde_json::json;
@@ -142,3 +143,9 @@ pub fn close_db(ds: web::Data<Datasources>) -> HttpResponse {
     };
     HttpResponse::Ok().content_type("text/plain").body(body.to_string())
 }*/
+
+#[post("/api/inventory/solve")]
+pub fn solve(item: web::Json<Vec<CategoryResult>>) -> HttpResponse {
+    let res = compute(item.0);
+    HttpResponse::Ok().json(res)
+}

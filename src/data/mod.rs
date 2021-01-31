@@ -2,6 +2,7 @@ use handlebars::Handlebars;
 mod config;
 mod lite_db;
 pub mod chat_broker;
+pub mod solver;
 
 use config::Config;
 use lite_db::LiteDB;
