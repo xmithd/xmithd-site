@@ -37,7 +37,7 @@ pub struct Post {
 pub struct InventoryItem {
     pub description: String,
     pub price: f64, //in Yen
-    pub items_sold: Option<usize>,
+    pub items_sold: Option<Vec<usize>>,
 }
 
 impl Clone for InventoryItem {
