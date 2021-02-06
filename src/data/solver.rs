@@ -84,19 +84,19 @@ pub fn compute(input: Vec<CategoryResult>) -> Vec<Category> {
         solutions.into_iter().for_each( | soln: Vec<u32> | {
             trace!("Combo {:?} matched!", soln);
             for x in 0..i.category.items.len() {
-                let copy = soln.clone();
+                //let copy = soln.clone();
                 let curr = i.category.items[x].items_sold.clone();
-                let mut replacement: Vec<usize> = vec![];
+                let mut replacement: Vec<usize>;
                 match curr {
                     None => {
-                        //i.category.items[x].items_sold =
+                        replacement = vec![];
                     }
                     Some(sold) => {
-                        replacement = sold.clone();
+                        replacement = sold;
                         //sold.push(copy[x] as usize);
                     }
                 }
-                replacement.push(copy[x] as usize);
+                replacement.push(soln[x] as usize);
                 i.category.items[x].items_sold = Some(replacement);
             }
         });
@@ -104,7 +104,7 @@ pub fn compute(input: Vec<CategoryResult>) -> Vec<Category> {
     }).collect()
 }
 
-// TODO: write more tests
+// TODO: write more tests with inputs without solution
 #[cfg(test)]
 mod tests {
 
@@ -190,5 +190,35 @@ mod tests {
         assert_eq!(res[2].items[0].items_sold, Some(vec![4]));
         assert_eq!(res[2].items[1].items_sold, Some(vec![10]));
         assert_eq!(res[2].items[2].items_sold, Some(vec![2]));
+    }
+
+    #[test]
+    fn test_multiple_solns() {
+        let input: Vec<CategoryResult> = vec![CategoryResult {
+            category: Category {
+                name: "Apple".to_string(),
+                items: vec![InventoryItem {
+                    description: "McIntosh".to_string(),
+                    price: 3.0,
+                    items_sold: None,
+                }, InventoryItem {
+                    description: "Fuji".to_string(),
+                    price: 3.0,
+                    items_sold: None,
+                }, InventoryItem {
+                    description: "Gala".to_string(),
+                    price: 3.0,
+                    items_sold: None,
+                }]
+            },
+            summary: InputSummary {
+                num_items: 3,
+                total_sale: 9.0
+            }
+        }];
+        let res = compute(input);
+        assert_eq!(res[0].items[0].items_sold, Some(vec![0, 0, 0, 0, 1, 1, 1, 2, 2, 3]));
+        assert_eq!(res[0].items[1].items_sold, Some(vec![0, 1, 2, 3, 0, 1, 2, 0, 1, 0]));
+        assert_eq!(res[0].items[2].items_sold, Some(vec![3, 2, 1, 0, 2, 1, 0, 1, 0, 0]));
     }
 }
