@@ -38,6 +38,7 @@ pub struct InventoryItem {
     pub description: String,
     pub price: f64, //in Yen
     pub items_sold: Option<Vec<usize>>,
+    pub total_price: Option<Vec<f64>>,
 }
 
 impl Clone for InventoryItem {
@@ -45,7 +46,8 @@ impl Clone for InventoryItem {
         Self {
             items_sold: self.items_sold.clone(),
             price: self.price,
-            description: String::from(&self.description)
+            description: String::from(&self.description),
+            total_price: self.total_price.clone()
         }
     }
 }
