@@ -32,7 +32,7 @@ fn render_index(folder_path: &str) -> Result<fs::NamedFile> {
 }
 */
 
-#[actix_rt::main]
+#[actix_web::rt::main]
 async fn main() -> io::Result<()> {
   let mut log_builder = Builder::from_default_env();
   log_builder.target(Target::Stdout);
@@ -53,7 +53,7 @@ async fn main() -> io::Result<()> {
         .service(routes::apps)
         .service(routes::about)
         .service(routes::contact)
-        .service(routes::blog)
+        .service(routes::notes)
         //.service(routes::close_db)
         .service(routes::user_list)
         .service(routes::post_raw)

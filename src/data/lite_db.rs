@@ -1,6 +1,5 @@
 use rusqlite;
-use rusqlite::{Connection, params, NO_PARAMS};
-//use rusqlite::{NO_PARAMS, named_params};
+use rusqlite::{Connection, params};
 use log::{error,debug, info};
 use std::sync::Mutex;
 
@@ -113,7 +112,7 @@ impl LiteDB {
     pub fn get_users(&self) -> rusqlite::Result<Vec<User>> {
         let conn = self.conn.lock().unwrap();
         let mut stmt = conn.prepare("SELECT u.username, u.is_admin FROM user u")?;
-        let results = stmt.query_map(NO_PARAMS, |row| -> rusqlite::Result<User> {
+        let results = stmt.query_map([], |row| -> rusqlite::Result<User> {
             debug!("Fetched row...");
             Ok(
                 User {

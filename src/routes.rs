@@ -71,7 +71,7 @@ pub fn user_list(ds: web::Data<Datasources>) -> HttpResponse {
     HttpResponse::Ok().content_type(constants::JSON_CONTENT_TYPE).body(body)
 }
 
-#[get("/blog/post/{id}")]
+#[get("/notes/post/{id}")]
 pub fn post_raw(ds: web::Data<Datasources>, info: web::Path<i32>) -> HttpResponse {
     let post = ds.db().get_post_by_id(info.into_inner());
     match post {
@@ -97,8 +97,8 @@ pub fn post_raw(ds: web::Data<Datasources>, info: web::Path<i32>) -> HttpRespons
     }
 }
 
-#[get("/blog")]
-pub fn blog(ds: web::Data<Datasources>) -> HttpResponse {
+#[get("/notes")]
+pub fn notes(ds: web::Data<Datasources>) -> HttpResponse {
     // TODO get offset and limit from the request query params...
     // current limit: 1000 posts which I won't reach anytime soon.
     let posts: Vec<PostIdent> = ds.db().get_posts(1000,0).or_else(|_: rusqlite::Error| -> Result<Vec<PostIdent>, String> {
@@ -108,7 +108,7 @@ pub fn blog(ds: web::Data<Datasources>) -> HttpResponse {
     let data = json!({
         "posts": &posts
     });
-    let body = ds.handlebars().render("blog", &data).unwrap();
+    let body = ds.handlebars().render("notes", &data).unwrap();
     HttpResponse::Ok().content_type(constants::HTML_CONTENT_TYPE).body(body)
 }
 
