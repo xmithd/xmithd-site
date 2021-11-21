@@ -23,5 +23,5 @@ version = "0.26"
 features = ["bundled"]
 
 [dependencies.handlebars]
-version = "3.5"
+version = "4.1"
 features = ["dir_source"]
