@@ -17,7 +17,7 @@ jobs:
       run: echo '${{ secrets.SITE_CONFIG }}' > config.json && docker build . --file Dockerfile --tag xmithd/website
     
     - name: Publish to Registry
-      uses: elgohr/Publish-Docker-Github-Action@2.6
+      uses: elgohr/Publish-Docker-Github-Action@v5
       with:
         name: xmithd/website
         username: ${{ secrets.DOCKER_USERNAME }}
