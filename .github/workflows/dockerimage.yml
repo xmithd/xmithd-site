@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
  
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - name: Build the Docker image
       run: echo '${{ secrets.SITE_CONFIG }}' > config.json && docker build . --file Dockerfile --tag xmithd/website
     
@@ -25,7 +25,7 @@ jobs:
         snapshot: true
 
     - name: Deploy to server
-      uses: appleboy/ssh-action@v0.0.4
+      uses: appleboy/ssh-action@v0.1.10
       with:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USER }}
