@@ -65,7 +65,7 @@ pub fn compute(input: Vec<CategoryResult>) -> Vec<Category> {
             let guess = combo.next();
             match guess {
                 None => {
-                    // reached the end of
+                    // reached the end of search tree
                     break
                 },
                 Some(guess) => {
