@@ -23,7 +23,7 @@ Add a `--release` option for release.
 ### Step 4: run with the desired log variables:
 From the root directory, run:
 ```
-RUST_LOG=xmithd_backend=debug,actix_web=info cargo run
+RUST_LOG=xmithd_backend=debug,tower_http=info cargo run
 ```
 
 That's it!

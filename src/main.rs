@@ -2,72 +2,85 @@ mod constants;
 mod routes;
 mod data;
 mod entity;
-mod websockets;
 
-use std::{io};
+use std::sync::Arc;
+use std::net::SocketAddr;
 
 extern crate log;
-extern crate env_logger;
 extern crate handlebars;
 
-use log::{info};
+use log::{info, error};
 
-use actix_files as fs;
+use axum::{
+    routing::{get, post},
+    Router,
+    extract::Extension,
+};
+use tokio::net::TcpListener;
+use tower_http::{
+    trace::{DefaultMakeSpan, TraceLayer},
+    services::ServeDir,
+};
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-#[macro_use]
-extern crate actix_web;
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+  tracing_subscriber::registry()
+        .with(tracing_subscriber::EnvFilter::new(
+            std::env::var("RUST_LOG").unwrap_or_else(|_| "xmithd_backend=debug,tower_http=info".into()),
+        ))
+        .with(tracing_subscriber::fmt::layer())
+        .init();
 
-use actix_web::{web, App, HttpServer};
-use actix_web::middleware::Logger;
-use env_logger::{Builder, Target};
-
-//#[macro_use]
-//extern crate serde_json;
-//extern crate serde_derive;
-
-/*
-fn render_index(folder_path: &str) -> Result<fs::NamedFile> {
-  let file = fs::NamedFile::open(format!("{}/index.html", folder_path))?;
-  Ok(file)
-}
-*/
-
-#[actix_web::rt::main]
-async fn main() -> io::Result<()> {
-  let mut log_builder = Builder::from_default_env();
-  log_builder.target(Target::Stdout);
-  log_builder.init();
   let state = data::Datasources::new();
-  let addr = format!("{}:{}", state.conf().host, state.conf().port);
-  info!("Starting http server at http://{}", &addr);
+  let addr_str = format!("{}:{}", state.conf().host, state.conf().port);
+  let addr: SocketAddr = addr_str.parse()?;
+
+  info!("Starting http server at http://{}", &addr_str);
   let static_files_path = String::from(&state.conf().static_files);
-  let datasources_ref = web::Data::new(state);
+  let datasources_arc = Arc::new(state);
 
-  // TODO add error handling middleware
+  let app = Router::new()
+      .route("/", get(routes::home))
+      .route("/apps", get(routes::apps))
+      .route("/about", get(routes::about))
+      .route("/contact", get(routes::contact))
+      .route("/notes", get(routes::notes))
+      .route("/notes/post/{id}", get(routes::post_raw))
+      .route("/users", get(routes::user_list))
+      .route("/simple_chat", get(routes::simple_chat))
+      .route("/utils/whatsmyip", get(routes::whatsmyip))
+      .route("/api/inventory/solve", post(routes::solve))
+      .nest_service("/public", ServeDir::new(&static_files_path))
+      .fallback_service(ServeDir::new(constants::PUBLIC_FOLDER))
+      .layer(Extension(datasources_arc.clone()))
+      .layer(
+            TraceLayer::new_for_http()
+                .make_span_with(DefaultMakeSpan::default().include_headers(true)),
+      );
 
-  HttpServer::new( move || {
-    App::new()
-        .wrap(Logger::new("%{r}a %t \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T"))
-        .app_data(datasources_ref.clone())
-        .service(routes::home)
-        .service(routes::apps)
-        .service(routes::about)
-        .service(routes::contact)
-        .service(routes::notes)
-        //.service(routes::close_db)
-        .service(routes::user_list)
-        .service(routes::post_raw)
-        .service(routes::simple_chat)
-        .service(routes::whatsmyip)
-        .data(web::JsonConfig::default().limit(4096))
-        .service(routes::solve)
-        .service(web::resource("/ws").route(web::get().to(websockets::ws_index)))
-        //.service(web::resource("/").route(web::get().to(|| render_index(constants::PUBLIC_FOLDER))))
-        .service(fs::Files::new("/public/", &static_files_path))
-        .service(fs::Files::new("/", constants::PUBLIC_FOLDER))
-  })
-  .bind(&addr)?
-  .run()
-  .await
+  info!("listening on {}", addr);
+  let listener = TcpListener::bind(addr).await?;
+  axum::serve(listener, app.into_make_service_with_connect_info::<SocketAddr>()).await?;
+
+  // Attempt to get the Datasources back from the Arc
+  let close_result = match Arc::try_unwrap(datasources_arc) {
+      Ok(ds) => {
+          info!("Server shut down gracefully. Closing database.");
+          ds.close_db()
+              .map_err(|e| {
+                  error!("Error closing database: {}", e);
+                  // Convert rusqlite::Error to Box<dyn std::error::Error>
+                  Box::new(e) as Box<dyn std::error::Error>
+              })
+      },
+      Err(_) => {
+          // This should theoretically not happen if the server shut down cleanly
+          error!("Failed to get exclusive ownership of Datasources; DB not closed explicitly.");
+          Ok(()) // Return Ok if we couldn't unwrap, not a critical error for main
+      }
+  };
+
+  close_result // Return the result from the match
 }
 

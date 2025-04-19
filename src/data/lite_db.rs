@@ -78,18 +78,34 @@ impl LiteDB {
         }
     }
 
-    /*pub fn close(&mut self) -> Result<(),&str> {
-        let conn = self.conn.lock().unwrap();
-        let res = conn.close();
-        match res {
-            Ok(_) => Ok(()),
-            Err((_conn, e)) => {
-                error!("Unable to close connection: {}", e);
-                self.conn = Mutex::new(_conn);
-                Err("Unable to close connection")
+    pub fn close(self) -> Result<(), rusqlite::Error> {
+        match self.conn.into_inner() {
+            Ok(conn) => {
+                // Close consumes the connection on success, returns it on error
+                match conn.close() {
+                    Ok(_) => Ok(()),
+                    Err((_conn, e)) => {
+                        // We can't do anything with _conn as self is consumed.
+                        error!("Failed to close connection: {}", e);
+                        Err(e)
+                    }
+                }
+            }
+            Err(poison_error) => {
+                // Mutex was poisoned. Log it.
+                // We can still try to close the connection inside.
+                error!("Mutex was poisoned. Attempting to close contained connection anyway.");
+                let conn = poison_error.into_inner();
+                match conn.close() {
+                    Ok(_) => Ok(()), // Succeeded despite poison
+                    Err((_conn, e)) => {
+                        error!("Failed to close poisoned connection: {}", e);
+                        Err(e) // Return the error from closing
+                    }
+                }
             }
         }
-    }*/
+    }
 
     pub fn check_or_create_tables(&self) -> Result<(), String> {
         let conn = self.conn.lock().expect("Failed to get handle on the connection");
