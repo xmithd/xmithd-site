@@ -1,4 +1,4 @@
-use handlebars::Handlebars;
+use handlebars::{Handlebars, DirectorySourceOptions};
 mod config;
 mod lite_db;
 pub mod solver;
@@ -21,8 +21,13 @@ impl Datasources {
         // Application Builder as an atomic reference-counted pointer.
         info!("Loading handlebars...");
         let mut handlebars = Handlebars::new();
+        let mut options = DirectorySourceOptions::default();
+        options.tpl_extension = ".hbs".to_string();
         handlebars
-            .register_templates_directory(".hbs", "./static/templates")
+            .register_templates_directory(
+                "./static/templates",
+                options,
+            )
             .unwrap();
         handlebars.set_strict_mode(true);
         info!("Handlebars loaded!");
