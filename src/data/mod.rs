@@ -8,13 +8,13 @@ use lite_db::LiteDB;
 
 use log::info;
 
-pub struct Datasources<'a> {
-    hb: handlebars::Handlebars<'a>,
+pub struct Datasources {
+    hb: handlebars::Handlebars<'static>,
     config: Config,
     db: LiteDB,
 }
 
-impl Datasources<'_> {
+impl Datasources {
     pub fn new() -> Self {
         // Handlebars uses a repository for the compiled templates. This object must be
         // shared between the application threads, and is therefore passed to the
@@ -40,7 +40,7 @@ impl Datasources<'_> {
         }
     }
 
-    pub fn handlebars(&self) -> &handlebars::Handlebars {
+    pub fn handlebars(&self) -> &handlebars::Handlebars<'static> {
         &self.hb
     }
 
