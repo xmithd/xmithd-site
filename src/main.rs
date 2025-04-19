@@ -48,7 +48,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
       .route("/notes", get(routes::notes))
       .route("/notes/post/{id}", get(routes::post_raw))
       .route("/users", get(routes::user_list))
-      .route("/simple_chat", get(routes::simple_chat))
       .route("/utils/whatsmyip", get(routes::whatsmyip))
       .route("/api/inventory/solve", post(routes::solve))
       .nest_service("/public", ServeDir::new(&static_files_path))
@@ -83,4 +82,3 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
   close_result // Return the result from the match
 }
-

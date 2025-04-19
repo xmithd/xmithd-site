@@ -37,10 +37,9 @@ fn json_content<T: serde::Serialize>(status: StatusCode, data: T) -> JsonApiResu
 // TODO add proper error handling using Axum's IntoResponse for custom error types
 
 // Removed #[get("/")] macro
-// Updated signature: Extension<Arc<Datasources>>, returns impl IntoResponse
 pub async fn home(Extension(ds): Extension<Arc<Datasources>>) -> HtmlResponse {
     // Clone config data to ensure correct lifetimes for json! macro
-    let site_name = ds.conf().site_domain.clone();
+    let site_name = &ds.conf().site_domain;
     let data = json!({
         "site_name": site_name,
     });
@@ -77,8 +76,7 @@ pub async fn apps(Extension(ds): Extension<Arc<Datasources>>) -> HtmlResponse {
 
 // Removed #[get("/about")] macro
 pub async fn about(Extension(ds): Extension<Arc<Datasources>>) -> HtmlResponse {
-    // Clone config data
-    let full_name = ds.conf().site_author.clone();
+    let full_name = &ds.conf().site_author;
     let data = json!({
         "full_name": full_name
     });
@@ -95,8 +93,8 @@ pub async fn about(Extension(ds): Extension<Arc<Datasources>>) -> HtmlResponse {
 // Removed #[get("/contact")] macro
 pub async fn contact(Extension(ds): Extension<Arc<Datasources>>) -> HtmlResponse {
     // Clone config data
-    let email = ds.conf().author_email.clone();
-    let twitter_handle = ds.conf().author_twitter.clone();
+    let email = &ds.conf().author_email;
+    let twitter_handle = &ds.conf().author_twitter;
     let data = json!({
         "email": email,
         "twitter_handle": twitter_handle
@@ -106,19 +104,6 @@ pub async fn contact(Extension(ds): Extension<Arc<Datasources>>) -> HtmlResponse
         Ok(body) => html_content(body),
         Err(e) => {
             log::error!("Handlebars render error (contact): {}", e);
-            html_content(format!("Template error: {}", e))
-        }
-    }
-}
-
-// Removed #[get("/simple_chat")] macro
-pub async fn simple_chat(Extension(ds): Extension<Arc<Datasources>>) -> HtmlResponse {
-    let data = json!({}); // Empty data for now
-    // Render first, then create response
-    match ds.handlebars().render("simple_chat", &data) {
-        Ok(body) => html_content(body),
-        Err(e) => {
-            log::error!("Handlebars render error (simple_chat): {}", e);
             html_content(format!("Template error: {}", e))
         }
     }
@@ -136,19 +121,8 @@ pub async fn user_list(Extension(ds): Extension<Arc<Datasources>>) -> Result<Jso
             Err(StatusCode::INTERNAL_SERVER_ERROR)
         }
     }
-    // Original: 
-    /*
-    let users: Vec<User> = ds.db().get_users().or_else( |_: rusqlite::Error| -> Result<Vec<User>, String> {
-        debug!("No users");
-        Ok(Vec::new())
-    }).unwrap();
-    let body = serde_json::to_string(&users).unwrap(); //format!("{}", json!(users));
-    HttpResponse::Ok().content_type(constants::JSON_CONTENT_TYPE).body(body)
-    */
 }
 
-// Removed #[get("/notes/post/{id}")] macro
-// Updated signature: Path extractor for id
 pub async fn post_raw(Extension(ds): Extension<Arc<Datasources>>, Path(id): Path<i32>) -> impl IntoResponse {
     // Keeping sync DB call for now
     match ds.db().get_post_by_id(id) {
@@ -159,9 +133,9 @@ pub async fn post_raw(Extension(ds): Extension<Arc<Datasources>>, Path(id): Path
             let mut html_output = String::new();
             html::push_html(&mut html_output, parser);
             // Clone data for template
-            let title = post_data.ident.title.clone();
-            let created = post_data.ident.created.clone(); // Assuming String or similar cloneable type
-            let updated = post_data.updated.clone(); // Assuming String or similar cloneable type
+            let title = &post_data.ident.title;
+            let created = post_data.ident.created;
+            let updated = post_data.updated;
             let template_data = json!({
               "raw_post": html_output, // html_output is already owned
               "title": title,
@@ -185,7 +159,6 @@ pub async fn post_raw(Extension(ds): Extension<Arc<Datasources>>, Path(id): Path
     }
 }
 
-// Removed #[get("/notes")] macro
 pub async fn notes(Extension(ds): Extension<Arc<Datasources>>) -> HtmlResponse {
     // Keeping sync DB call for now
     let posts: Vec<PostIdent> = ds.db().get_posts(1000,0).unwrap_or_else(|e| {
@@ -205,50 +178,22 @@ pub async fn notes(Extension(ds): Extension<Arc<Datasources>>) -> HtmlResponse {
     }
 }
 
-// Removed #[get("/utils/whatsmyip")] macro
-// Updated signature: Use ConnectInfo extractor for client address
-pub async fn whatsmyip(ConnectInfo(addr): ConnectInfo<SocketAddr>) -> impl IntoResponse {
+// Use ConnectInfo extractor for client address and HeaderMap
+pub async fn whatsmyip(ConnectInfo(addr): ConnectInfo<SocketAddr>, headers: HeaderMap) -> impl IntoResponse {
     // Axum provides the client socket address directly via ConnectInfo
-    // Note: This gives the direct peer address. X-Real-IP handling would require reading headers.
-    // TODO: Add header reading logic if needed (e.g., using TypedHeader extractor)
-    (StatusCode::OK, addr.ip().to_string())
-    /* Original:
-    let ip_addr_op = req.peer_addr().map(|t| {
-        t.ip()
-    });
-    if let Some(ip_addr) = ip_addr_op {
-        let body = match req.headers().get("X-Real-IP") {
-            Some(addr) => {
-                let ret = match addr.to_str() {
-                    Ok(val) => String::from(val),
-                    Err(_) => format!("{}", ip_addr)
-                };
-                ret
-            },
-            None => format!("{}", ip_addr)
-        };
-        HttpResponse::Ok().content_type("text/plain").body(body)
-    } else {
-        HttpResponse::BadRequest().finish()
-    }
-    */
-}
+    // Check for X-Real-IP header first
+    let ip_to_return = headers
+        .get("X-Real-IP")
+        .and_then(|hv| hv.to_str().ok())
+        .map(|s| s.to_string()) // Convert valid header to String
+        .unwrap_or_else(|| addr.ip().to_string()); // Fallback to peer IP
 
-/* // close_db route removed in main.rs as well
-#[get("/close_db")]
-pub fn close_db(ds: web::Data<Datasources>) -> HttpResponse {
-    let op = ds.db().close();
-    let body = match op {
-        Ok(_) => "DB closed!",
-        Err(reason) => reason
-    };
-    HttpResponse::Ok().content_type("text/plain").body(body.to_string())
-}*/
+    (StatusCode::OK, ip_to_return)
+}
 
 // Updated signature: Json extractor, returns Json response with Vec<Category>
 pub async fn solve(Json(payload): Json<Vec<CategoryResult>>) -> JsonResponse<Vec<Category>> {
     // Assuming compute is a sync function for now
     let res = compute(payload);
     JsonResponse(res)
-    // Original: HttpResponse::Ok().json(res)
 }
