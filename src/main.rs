@@ -2,15 +2,14 @@ mod constants;
 mod routes;
 mod data;
 mod entity;
-mod websockets;
 
-use std::{io};
+use std::io;
 
 extern crate log;
 extern crate env_logger;
 extern crate handlebars;
 
-use log::{info};
+use log::info;
 
 use actix_files as fs;
 
@@ -61,7 +60,7 @@ async fn main() -> io::Result<()> {
         .service(routes::whatsmyip)
         .data(web::JsonConfig::default().limit(4096))
         .service(routes::solve)
-        .service(web::resource("/ws").route(web::get().to(websockets::ws_index)))
+        //.service(web::resource("/ws").route(web::get().to(websockets::ws_index)))
         //.service(web::resource("/").route(web::get().to(|| render_index(constants::PUBLIC_FOLDER))))
         .service(fs::Files::new("/public/", &static_files_path))
         .service(fs::Files::new("/", constants::PUBLIC_FOLDER))
