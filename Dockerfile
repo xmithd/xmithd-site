@@ -1,6 +1,6 @@
 # Cargo build stage to build dependencies separately
 
-FROM rust:latest as builder
+FROM rust:latest AS builder
 
 # RUN apt-get update
 # RUN apt-get install musl-tools -y
@@ -40,7 +40,7 @@ COPY config.json .
 RUN chown xmithd:xmithd config.json
 RUN chown xmithd:xmithd xmithd_backend
 RUN chown -R xmithd:xmithd static
-ENV RUST_LOG="xmithd_backend=debug,actix_web=info"
+ENV RUST_LOG="xmithd_backend=debug,tower-http=info"
 EXPOSE 3001
 VOLUME /home/xmithd/bin/database
 

@@ -56,4 +56,9 @@ impl Datasources {
     pub fn db(&self) -> &LiteDB {
         &self.db
     }
+
+    pub fn close_db(self) -> Result<(), rusqlite::Error> {
+        info!("Closing database connection...");
+        self.db.close()
+    }
 }

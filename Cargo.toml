@@ -2,7 +2,7 @@
 name = "xmithd_backend"
 version = "2.0.0"
 authors = ["xmithd <xmithd@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 log = "0.4"
@@ -10,12 +10,11 @@ env_logger = "0.11"
 # Enable derive feature for serde
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-pulldown-cmark = "0.9"
-rand = "0.8"
+pulldown-cmark = "0.13"
 # Add axum, tokio, and tower-http
 axum = { version = "0.8" }
 tokio = { version = "1", features = ["full"] }
-tower-http = { version = "0.5", features = ["fs", "trace"] }
+tower-http = { version = "0.6", features = ["fs", "trace"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 

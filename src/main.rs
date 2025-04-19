@@ -9,7 +9,7 @@ use std::net::SocketAddr;
 extern crate log;
 extern crate handlebars;
 
-use log::info;
+use log::{info, error};
 
 use axum::{
     routing::{get, post},
@@ -53,7 +53,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
       .route("/api/inventory/solve", post(routes::solve))
       .nest_service("/public", ServeDir::new(&static_files_path))
       .fallback_service(ServeDir::new(constants::PUBLIC_FOLDER))
-      .layer(Extension(datasources_arc))
+      .layer(Extension(datasources_arc.clone()))
       .layer(
             TraceLayer::new_for_http()
                 .make_span_with(DefaultMakeSpan::default().include_headers(true)),
@@ -63,6 +63,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
   let listener = TcpListener::bind(addr).await?;
   axum::serve(listener, app.into_make_service_with_connect_info::<SocketAddr>()).await?;
 
-  Ok(())
+  // Attempt to get the Datasources back from the Arc
+  let close_result = match Arc::try_unwrap(datasources_arc) {
+      Ok(ds) => {
+          info!("Server shut down gracefully. Closing database.");
+          ds.close_db()
+              .map_err(|e| {
+                  error!("Error closing database: {}", e);
+                  // Convert rusqlite::Error to Box<dyn std::error::Error>
+                  Box::new(e) as Box<dyn std::error::Error>
+              })
+      },
+      Err(_) => {
+          // This should theoretically not happen if the server shut down cleanly
+          error!("Failed to get exclusive ownership of Datasources; DB not closed explicitly.");
+          Ok(()) // Return Ok if we couldn't unwrap, not a critical error for main
+      }
+  };
+
+  close_result // Return the result from the match
 }
 
