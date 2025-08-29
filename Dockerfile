@@ -11,6 +11,9 @@ COPY Cargo.toml Cargo.toml
 COPY Cargo.lock Cargo.lock
 RUN mkdir src/
 RUN echo "fn main() {println!(\"Hello, world!\")}" > src/main.rs
+
+# Add compiler (if not included in the image) - uncomment if build machine is not x86_64
+# RUN rustup target add x86_64-unknown-linux-gnu
 RUN cargo build --release --target=x86_64-unknown-linux-gnu
 
 # Do some cleanup
@@ -26,11 +29,12 @@ RUN cargo build --release --target=x86_64-unknown-linux-gnu
 FROM debian:stable-slim
 
 # Note: currently addgroup is not included in the slim image
-RUN apt-get update && apt-get install -y adduser
-
-RUN addgroup --gid 1000 xmithd
-
-RUN adduser --gecos "" --disabled-password --shell /bin/bash --uid 1000 --ingroup xmithd xmithd
+# solution: use groupadd and useradd
+# RUN apt-get update && apt-get install -y adduser
+# RUN addgroup --gid 1000 xmithd
+# RUN adduser --gecos "" --disabled-password --shell /bin/bash --uid 1000 --ingroup xmithd xmithd
+RUN groupadd --gid 1000 xmithd
+RUN useradd --create-home --shell /bin/bash --uid 1000 --gid xmithd xmithd
 
 WORKDIR /home/xmithd/bin/
 
