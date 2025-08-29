@@ -25,6 +25,9 @@ RUN cargo build --release --target=x86_64-unknown-linux-gnu
 
 FROM debian:stable-slim
 
+# Note: currently addgroup is not included in the slim image
+RUN apt-get update && apt-get install -y adduser
+
 RUN addgroup --gid 1000 xmithd
 
 RUN adduser --gecos "" --disabled-password --shell /bin/bash --uid 1000 --ingroup xmithd xmithd
