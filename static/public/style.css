@@ -33,15 +33,16 @@ html, body {
     grid-template-columns: 100%;
 }
 
-#nav-toggle, .burger-menu {
+.nav-details {
     display: none;
-}
-
-.burger-menu {
     grid-column: 3;
     align-self: center;
     margin-right: 15px;
     grid-row: 1;
+}
+
+.burger-menu {
+    cursor: pointer;
 }
 
 .nav-container {
@@ -130,7 +131,7 @@ article pre code {
 
 @media only screen and (max-width: 1025px) {
 
-    .burger-menu {
+    .nav-details {
         display: inline-block;
         text-align: right;
     }
@@ -154,7 +155,7 @@ article pre code {
         margin-left: 15px;
     }
 
-    #nav-toggle:checked ~ .right-menu, #nav-toggle:checked ~ .left-menu {
+    .nav-details[open] ~ .right-menu, .nav-details[open] ~ .left-menu {
         display: grid;
     }
 }
@@ -173,5 +174,17 @@ footer .content {
 span.copyleft {
     display: inline-block;
     transform: rotate(180deg);
+}
+
+summary::-webkit-details-marker {
+    display: none;
+}
+
+summary {
+    list-style: none;
+}
+
+summary:focus {
+    outline: none;
 }
 
