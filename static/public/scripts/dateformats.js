@@ -1,5 +1,6 @@
 'use strict';
 
+// Note: this file is deprecated.
 const DEBUG_MODE = false;
 
 function debugln(msg) {

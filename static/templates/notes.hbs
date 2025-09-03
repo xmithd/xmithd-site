@@ -8,7 +8,7 @@
     <h1>Notes</h1>
     <ul>
     {{#each posts}}
-      <p><i class="xm_timestamp">zu-{{this.created}}</i>&nbsp;<a href="/notes/post/{{this.id}}">{{this.title}}</a></p>
+      <p><i class="xm_timestamp">{{this.created}}</i>&nbsp;<a href="/notes/post/{{this.id}}">{{this.title}}</a></p>
     {{else}}
       <p>There are no posts yet.</p>
     {{/each}}
@@ -16,6 +16,5 @@
   </main>
   {{>site_footer}}
 </div>
-<script src="/scripts/dateformats.js"></script>
 </body>
 </html>

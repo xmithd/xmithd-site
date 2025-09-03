@@ -3,7 +3,7 @@ use axum::{
     response::{Html, IntoResponse, Json as JsonResponse},
     http::{StatusCode, HeaderMap, HeaderValue},
 };
-use std::sync::Arc; // For shared state
+use std::{collections::HashMap, sync::Arc}; // For shared state
 use std::net::SocketAddr; // For ConnectInfo
 
 use super::constants;
@@ -15,6 +15,8 @@ use log::debug;
 use serde_json::json;
 
 use pulldown_cmark::{Parser, Options, html};
+
+use chrono::{TimeZone, Utc};
 
 // Define a helper type for Axum responses with HTML content type
 type HtmlResponse = (HeaderMap, Html<String>);
@@ -32,6 +34,11 @@ fn json_content<T: serde::Serialize>(status: StatusCode, data: T) -> JsonApiResu
     let mut headers = HeaderMap::new();
     headers.insert(axum::http::header::CONTENT_TYPE, HeaderValue::from_static(constants::JSON_CONTENT_TYPE));
     (status, headers, JsonResponse(data))
+}
+
+fn convert_to_datetime_string(millis: i64) -> String {
+    let date_time = Utc.timestamp_millis_opt(millis).unwrap();
+    date_time.format("%Y-%m-%d %H:%M:%S UTC").to_string()
 }
 
 // TODO add proper error handling using Axum's IntoResponse for custom error types
@@ -74,7 +81,6 @@ pub async fn apps(Extension(ds): Extension<Arc<Datasources>>) -> HtmlResponse {
     }
 }
 
-// Removed #[get("/about")] macro
 pub async fn about(Extension(ds): Extension<Arc<Datasources>>) -> HtmlResponse {
     let full_name = &ds.conf().site_author;
     let data = json!({
@@ -90,7 +96,6 @@ pub async fn about(Extension(ds): Extension<Arc<Datasources>>) -> HtmlResponse {
     }
 }
 
-// Removed #[get("/contact")] macro
 pub async fn contact(Extension(ds): Extension<Arc<Datasources>>) -> HtmlResponse {
     // Clone config data
     let email = &ds.conf().author_email;
@@ -109,7 +114,7 @@ pub async fn contact(Extension(ds): Extension<Arc<Datasources>>) -> HtmlResponse
     }
 }
 
-// Removed #[get("/users")] macro
+
 pub async fn user_list(Extension(ds): Extension<Arc<Datasources>>) -> Result<JsonApiResult<Vec<User>>, StatusCode> {
     // Database operations should ideally be async, or run in a blocking thread pool
     // For simplicity, keeping sync calls here but be aware of blocking risks
@@ -132,10 +137,9 @@ pub async fn post_raw(Extension(ds): Extension<Arc<Datasources>>, Path(id): Path
             let parser = Parser::new_ext(&post_data.content, options);
             let mut html_output = String::new();
             html::push_html(&mut html_output, parser);
-            // Clone data for template
             let title = &post_data.ident.title;
-            let created = post_data.ident.created;
-            let updated = post_data.updated;
+            let created = convert_to_datetime_string(post_data.ident.created);
+            let updated = convert_to_datetime_string(post_data.updated);
             let template_data = json!({
               "raw_post": html_output, // html_output is already owned
               "title": title,
@@ -165,8 +169,16 @@ pub async fn notes(Extension(ds): Extension<Arc<Datasources>>) -> HtmlResponse {
         debug!("Failed to get posts: {}", e);
         Vec::new()
     });
+    let posts_display: Vec<HashMap<&str, String>> = posts.iter().map( | ident | {
+        HashMap::from([
+            ("id", ident.id.to_string()),
+            ("title", ident.title.clone()),
+            ("created", convert_to_datetime_string(ident.created))
+        ])
+    }).collect(); 
     let data = json!({
-        "posts": &posts // Reference is okay here as `posts` lives long enough
+        // Reference is okay here as `posts_display` lives long enough
+        "posts": &posts_display
     });
     // Render first, then create response
     match ds.handlebars().render("notes", &data) {
